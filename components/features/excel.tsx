@@ -140,9 +140,9 @@ const ExcelComponent = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="flex items-center gap-4 mb-6">
-        <Search onSearch={handleSearch} className="flex-1" />
-        <div className="flex gap-2">
+      <div className="flex items-center justify-center gap-4 mb-6">
+        <div>
+
           <MultiSelect
             options={headers}
             selectedOptions={selectedHeadings}
@@ -164,7 +164,10 @@ const ExcelComponent = () => {
                 color: 'black',
               })
             }}
-          />
+            />
+            </div>
+        <Search onSearch={handleSearch} className="flex-1" />
+        <div className="flex gap-2">
           <Button
             onClick={handleSaveChanges}
             className="bg-blue-500 text-white px-4 py-2 rounded"
