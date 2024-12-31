@@ -1,3 +1,4 @@
+import axios from "axios";
 import React, { useState } from "react";
 
 const AddCaseModal = ({ isOpen, onClose }) => {
@@ -14,19 +15,27 @@ const AddCaseModal = ({ isOpen, onClose }) => {
     last_hearing_date: "",
     remarks: "",
   });
-
+  const [error, setError] = useState("");
   const handleNext = () => setStep((prev) => prev + 1);
   const handlePrevious = () => setStep((prev) => prev - 1);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post("/api/CourtCases", formData);
+      console.log("this is form data",formData)
+      // Handle success (e.g., redirect or show message)
+    } catch (err) {
+      setError("Error creating user");
+    }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // onSubmit(formData);
-    onClose();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
   };
 
   if (!isOpen) return null;

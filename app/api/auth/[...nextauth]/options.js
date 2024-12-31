@@ -71,6 +71,7 @@ export const options = {
       },
     },
     pages: {
-      signIn: "/Login", // Custom sign-in page
+      signIn: "/Login",
+      signOut:"/Logout" // Custom sign-in page
     },
   };

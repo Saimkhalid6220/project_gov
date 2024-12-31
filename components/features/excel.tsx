@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import Search from "./search";
 import MultiSelect from '@/components/features/filter';
 import { Trash2, Edit } from "lucide-react";
+import AddCaseModal from "@/components/AddCaseModal";
 
 const ExcelComponent = () => {
   const [cases, setCases] = useState([]);
@@ -121,6 +122,15 @@ const ExcelComponent = () => {
     return status === 'closed' || status === 'dismissed' || status === 'disposed off';
   }).length;
 
+  const [isModalOpen, setModalOpen] = useState(false);
+
+  const handleAddCaseClick = () => {
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+  };
   return (
     <div className="min-h-screen bg-white text-black p-6">
       {/* Stats Cards */}
@@ -174,6 +184,17 @@ const ExcelComponent = () => {
           >
             Save Changes
           </Button>
+          <Button
+        onClick={handleAddCaseClick}
+        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+      >
+        Add Case
+      </Button>
+          <AddCaseModal
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        // onSubmit={handleFormSubmit}
+      />
         </div>
       </div>
 
