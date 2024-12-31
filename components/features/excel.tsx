@@ -1,285 +1,235 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
 import Search from "./search";
+import MultiSelect from '@/components/features/filter';
+import { Trash2, Edit } from "lucide-react";
 
-const ExcelComponent = ({ data }) => {
-  const [filter, setFilter] = useState('');
-  const [filteredData, setFilteredData] = useState(data);
+const ExcelComponent = () => {
+  const [cases, setCases] = useState([]);
+  const [headers, setHeaders] = useState([]);
+  const [selectedHeadings, setSelectedHeadings] = useState([]);
+  const [filteredCases, setFilteredCases] = useState([]);
+  const [editingRow, setEditingRow] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
 
-  const handleFilterChange = (event) => {
-    const selectedFilter = event.target.value;
-    setFilter(selectedFilter);
-    if (selectedFilter) {
-      setFilteredData(data.filter(item => item.heading === selectedFilter));
-    } else {
-      setFilteredData(data);
-    }
+  // Add save changes functionality
+  const handleSaveChanges = () => {
+    localStorage.setItem('tableData', JSON.stringify(cases));
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setIsLoading(true);
+        // Update the path to point to your public directory
+        const response = await fetch('/DATA.xlsx');
+        if (!response.ok) {
+          throw new Error('Failed to fetch Excel file');
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        const data = new Uint8Array(arrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+        
+        if (json.length > 0) {
+          setHeaders(json[0]);
+          setCases(json.slice(1));
+          setFilteredCases(json.slice(1));
+        }
+      } catch (error) {
+        console.error('Error loading Excel file:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleFilterChange = (selectedOptions) => {
+    setSelectedHeadings(selectedOptions);
+    
+    let filtered = [...cases];
+
+    if (selectedOptions.length > 0) {
+      filtered = filtered.map(row => {
+        const newRow = new Array(headers.length).fill(''); // Initialize with empty strings
+        selectedOptions.forEach(heading => {
+          const columnIndex = headers.indexOf(heading);
+          if (columnIndex !== -1) {
+            newRow[columnIndex] = row[columnIndex] || ''; // Keep original data or empty string
+          }
+        });
+        return newRow;
+      });
+
+      // Remove rows where all selected columns are empty
+      filtered = filtered.filter(row =>
+        selectedOptions.some(heading => {
+          const columnIndex = headers.indexOf(heading);
+          return columnIndex !== -1 && 
+            row[columnIndex]?.toString().trim() !== '';
+        })
+      );
+    }
+
+    // Apply search filter if exists
+    if (searchQuery) {
+      filtered = filtered.filter(row =>
+        row.some(cell =>
+          cell?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      );
+    }
+
+    setFilteredCases(filtered);
+  };
+
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    
+    let filtered = [...cases];
+
+    // Apply search filter
+    if (query) {
+      filtered = filtered.filter(row =>
+        row.some(cell =>
+          cell?.toString().toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    }
+
+    // Apply column filters if any selected
+    if (selectedHeadings.length > 0) {
+      filtered = filtered.filter(row =>
+        selectedHeadings.some(heading => {
+          const columnIndex = headers.indexOf(heading);
+          return columnIndex !== -1 && 
+            row[columnIndex]?.toString().toLowerCase().trim() !== '';
+        })
+      );
+    }
+
+    setFilteredCases(filtered);
+  };
+
+  // Stats calculation
+  const totalCases = cases.length;
+  const activeCases = cases.filter(row => row[headers.indexOf('Status')] === 'Active').length;
+  const closedCases = cases.filter(row => row[headers.indexOf('Status')] === 'Closed').length;
+
   return (
-    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center">
-      {/* Filter Button */}
-      <div className="flex justify-center mt-4">
-        <select value={filter} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded">
-          <option value="">Select a heading to filter</option>
-          {data.map((item, index) => (
-            <option key={index} value={item.heading}>{item.heading}</option>
-          ))}
-        </select>
+    <div className="min-h-screen bg-white text-black p-6">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-700">Total Cases</h3>
+          <p className="text-2xl font-semibold mt-2 text-black">{totalCases}</p>
+        </div>
+        <div className="p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-700">Active Cases</h3>
+          <p className="text-2xl font-semibold mt-2 text-green-600">{activeCases}</p>
+        </div>
+        <div className="p-4 rounded-lg bg-white border border-gray-200 shadow-sm">
+          <h3 className="text-sm font-medium text-gray-700">Closed Cases</h3>
+          <p className="text-2xl font-semibold mt-2 text-red-600">{closedCases}</p>
+        </div>
       </div>
 
-      {/* Table */}
-      <div className="mt-4 w-full">
-        {filteredData.length > 0 ? (
-          <table className="min-w-full bg-white">
-            <thead>
-              <tr>
-                {/* Add your table headers here */}
-              </tr>
-            </thead>
-            <tbody>
-              {filteredData.map((row, rowIndex) => (
-                <tr key={rowIndex}>
-                  {/* Add your table row data here */}
-                  <td>
-                    <Button onClick={() => handleSaveRow(rowIndex)}>
-                      Save
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-600 text-center">
-            No data to display. Upload files to populate the table.
-          </p>
+      {/* Search and Filter */}
+      <div className="flex items-center gap-4 mb-6">
+        <Search onSearch={handleSearch} className="flex-1" />
+        {headers.length > 0 && (
+          <div className="flex gap-2">
+            <MultiSelect
+              options={headers}
+              selectedOptions={selectedHeadings}
+              onChange={handleFilterChange}
+              className="w-48 bg-white text-black border border-gray-200 rounded-md shadow-sm"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  backgroundColor: 'white',
+                  color: 'black',
+                }),
+                menu: (base) => ({
+                  ...base,
+                  backgroundColor: 'white',
+                }),
+                option: (base, state) => ({
+                  ...base,
+                  backgroundColor: state.isFocused ? '#f3f4f6' : 'white',
+                  color: 'black',
+                })
+              }}
+            />
+            <Button
+              onClick={handleSaveChanges}
+              className="bg-blue-500 text-white px-4 py-2 rounded"
+            >
+              Save Changes
+            </Button>
+          </div>
         )}
       </div>
 
-      {/* Add Case Button */}
-      <div className="mt-4 flex justify-center">
-        <Button variant="secondary" onClick={handleAddRow}>
-          Add Case
-        </Button>
+      {/* Table */}
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr>
+              {headers.map((header, index) => (
+                <th key={index} className="border-b border-gray-200 p-3 text-left text-sm font-semibold text-gray-900 bg-white">
+                  {header}
+                </th>
+              ))}
+              <th className="border-b border-gray-200 p-3 text-center text-sm font-semibold text-gray-900 bg-white w-24">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredCases.map((row, rowIndex) => (
+              <tr key={rowIndex} className="hover:bg-gray-50">
+                {row.map((cell, cellIndex) => (
+                  <td key={cellIndex} className="border-b border-gray-200 p-3 text-sm text-gray-900">
+                    {cell}
+                  </td>
+                ))}
+                <td className="border-b border-gray-200 p-3">
+                  <div className="flex justify-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-700 hover:text-black hover:bg-gray-100"
+                      onClick={() => handleEdit(rowIndex)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-gray-700 hover:text-red-600 hover:bg-gray-100"
+                      onClick={() => handleDelete(rowIndex)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
 
-export default function LegalDashboard() {
-  const [cases, setCases] = useState<any[][]>([]);
-  const [filteredCases, setFilteredCases] = useState<any[][]>([]);
-  const [dragging, setDragging] = useState(false);
-  const [originalFile, setOriginalFile] = useState<File | null>(null);
-  const [editingRow, setEditingRow] = useState<number | null>(null);
-  const [editedRow, setEditedRow] = useState<any[]>([]);
-
-  // Handle File Upload
-  const handleFileUpload = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const file = files[0];
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const data = e.target?.result;
-      const workbook = XLSX.read(data, { type: "binary" });
-
-      // Assuming only one sheet is uploaded
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const sheetData = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
-
-      const formattedSheetData = sheetData.map((row: any[]) => {
-        return row.map((cell) => (cell === "" ? "" : String(cell)));
-      });
-
-      setCases(formattedSheetData); // Set the data to the state
-      setFilteredCases(formattedSheetData); // Initialize filtered cases
-      setOriginalFile(file); // Save the original file for later export
-    };
-    reader.readAsBinaryString(file);
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setDragging(false);
-    handleFileUpload(e.dataTransfer.files);
-  };
-
-  const handleEditRow = (rowIndex: number) => {
-    setEditingRow(rowIndex);
-    setEditedRow([...cases[rowIndex]]);
-  };
-
-  const handleSaveRow = (rowIndex: number) => {
-    const updatedCases = [...cases];
-    updatedCases[rowIndex] = editedRow.map((cell) => (cell === "" ? "" : cell));
-    setCases(updatedCases);
-    setFilteredCases(updatedCases);
-    setEditingRow(null);
-  };
-
-  const handleChangeCell = (value: string, cellIndex: number) => {
-    const updatedRow = [...editedRow];
-    updatedRow[cellIndex] = value;
-    setEditedRow(updatedRow);
-  };
-
-  const handleAddRow = () => {
-    const newRow = Array(cases[0].length).fill(""); // Add a new row with empty values
-    const lastSrNo = cases.length > 1 ? parseInt(cases[cases.length - 1][0], 10) : 0;
-    newRow[0] = (lastSrNo + 1).toString(); // Set the "Sr. No" to the next number
-    newRow[newRow.length - 1] = "Pending"; // Set the "Status" to "Pending"
-    setCases([...cases, newRow]);
-    setFilteredCases([...cases, newRow]);
-  };
-
-  const handleDeleteRow = (rowIndex: number) => {
-    const updatedCases = cases.filter((_, index) => index !== rowIndex);
-    setCases(updatedCases);
-    setFilteredCases(updatedCases);
-  };
-
-  const handleSearch = (query: string) => {
-    if (!query) {
-      setFilteredCases(cases);
-      return;
-    }
-    const lowercasedQuery = query.toLowerCase();
-    const filtered = cases.filter((row) =>
-      row.some((cell) => cell.toLowerCase().includes(lowercasedQuery))
-    );
-    setFilteredCases(filtered);
-  };
-
-  return (
-    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center">
-      {/* Summary Cards */}
-      <div className="flex flex-wrap justify-center gap-8 mt-20 lg:mt-32">
-        <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-xl p-6 w-64 h-48 shadow-lg">
-          <h2 className="text-2xl font-bold">Total Cases</h2>
-          <p className="text-4xl font-semibold">{cases.length - 1}</p>
-        </div>
-
-        <div className="flex flex-col items-center justify-center bg-green-500 text-white rounded-xl p-6 w-64 h-48 shadow-lg">
-          <h2 className="text-2xl font-bold">Active Cases</h2>
-          <p className="text-4xl font-semibold">{cases.slice(1).filter((row) => row[row.length - 1] !== "Disposed off").length}</p>
-        </div>
-
-        <div className="flex flex-col items-center justify-center bg-red-500 text-white rounded-xl p-6 w-64 h-48 shadow-lg">
-          <h2 className="text-2xl font-bold">Closed Cases</h2>
-          <p className="text-4xl font-semibold">{cases.slice(1).filter((row) => row[row.length - 1] === "Disposed off").length}</p>
-        </div>
-      </div>
-
-      {/* Drag-and-Drop Section */}
-      <div
-        className={`mt-4 p-4 border-2 ${dragging ? "border-gray-300 bg-gray-100" : "border-gray-500"} rounded-lg flex flex-col items-center justify-center`}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-        onDrop={handleDrop}
-      >
-        <p className="text-sm mb-2">Drag and drop your Excel files here, or click the button to upload.</p>
-        <Button
-          variant="secondary"
-          onClick={() => document.querySelector('input[type="file"]')?.click()}
-        >
-          Select File
-        </Button>
-        <input
-          type="file"
-          accept=".xlsx, .xls"
-          multiple
-          className="hidden"
-          onChange={(e) => handleFileUpload(e.target.files)}
-        />
-      </div>
-
-      {/* Search Section */}
-      <div className="mt-4 w-full max-w-6xl flex justify-center">
-        <Search onSearch={handleSearch} />
-      </div>
-
-      {/* Table Section */}
-      <div className="mt-4 overflow-auto w-full max-w-6xl">
-        {filteredCases.length > 0 ? (
-          <table className="w-full border-collapse border border-gray-500 bg-white text-black text-sm">
-            <thead>
-              <tr className="border-b border-gray-500">
-                {cases[0].map((header, index) => (
-                  <th key={index} className="border border-gray-500 p-2 text-center">
-                    {header}
-                  </th>
-                ))}
-                <th className="border border-gray-500 p-2 text-center">Actions</th>
-                <th className="border border-gray-500 p-2 text-center">Delete</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredCases.slice(1).map((row, rowIndex) => (
-                <tr key={rowIndex} className="border-b border-gray-500">
-                  {row.map((cell, cellIndex) => (
-                    <td
-                      key={cellIndex}
-                      className={`p-2 text-center ${editingRow === rowIndex ? "" : "border border-gray-500"}`}
-                    >
-                      {editingRow === rowIndex ? (
-                        <input
-                          type="text"
-                          value={editedRow[cellIndex] || ""}
-                          onChange={(e) => handleChangeCell(e.target.value, cellIndex)}
-                          className="bg-transparent text-center w-full"
-                        />
-                      ) : (
-                        cell
-                      )}
-                    </td>
-                  ))}
-                  <td className="border border-gray-500 p-2 text-center">
-                    {editingRow === rowIndex ? (
-                      <Button variant="primary" onClick={() => handleSaveRow(rowIndex)}>
-                        Save
-                      </Button>
-                    ) : (
-                      <Button variant="secondary" onClick={() => handleEditRow(rowIndex)}>
-                        Edit
-                      </Button>
-                    )}
-                  </td>
-                  <td className="border border-gray-500 p-2 text-center">
-                    <Button variant="danger" onClick={() => handleDeleteRow(rowIndex + 1)}>
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="text-gray-600 text-center">
-            No data to display. Upload files to populate the table.
-          </p>
-        )}
-      </div>
-
-      {/* Add Case Button */}
-      <div className="mt-4 flex justify-center">
-        <Button variant="secondary" onClick={handleAddRow}>
-          Add Case
-        </Button>
-      </div>
-    </div>
-  );
-}
+export default ExcelComponent;
