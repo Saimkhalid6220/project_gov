@@ -161,7 +161,7 @@ const MultiSelect = ({ options, selectedOptions, onChange }) => {
           className="text-black"
         />
       </SelectTrigger>
-      <SelectContent className="bg-white border border-gray-200 shadow-lg">
+      <SelectContent className="bg-white border border-gray-200 shadow-lg max-h-[300px] overflow-y-auto">
         <SelectItem
           key="none"
           value="none"
@@ -174,19 +174,23 @@ const MultiSelect = ({ options, selectedOptions, onChange }) => {
           <SelectItem
             key={option}
             value={option}
-            onClick={() => handleSelect(option)}
-            className={`text-black hover:bg-gray-50 ${
-              selectedOptions.includes(option) ? 'bg-gray-100' : ''
+            onClick={(e) => {
+              e.preventDefault();
+              handleSelect(option);
+            }}
+            className={`text-black hover:bg-gray-50 cursor-pointer ${
+              selectedOptions.includes(option) ? 'bg-gray-50' : ''
             }`}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full">
               <input
                 type="checkbox"
                 checked={selectedOptions.includes(option)}
-                readOnly
-                className="h-4 w-4 rounded border-gray-300"
+                onChange={() => handleSelect(option)}
+                className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                onClick={(e) => e.stopPropagation()}
               />
-              {option}
+              <span className="flex-1">{option}</span>
             </div>
           </SelectItem>
         ))}
