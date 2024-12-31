@@ -5,6 +5,71 @@ import * as XLSX from "xlsx";
 import { Button } from "@/components/ui/button";
 import Search from "./search";
 
+const ExcelComponent = ({ data }) => {
+  const [filter, setFilter] = useState('');
+  const [filteredData, setFilteredData] = useState(data);
+
+  const handleFilterChange = (event) => {
+    const selectedFilter = event.target.value;
+    setFilter(selectedFilter);
+    if (selectedFilter) {
+      setFilteredData(data.filter(item => item.heading === selectedFilter));
+    } else {
+      setFilteredData(data);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center">
+      {/* Filter Button */}
+      <div className="flex justify-center mt-4">
+        <select value={filter} onChange={handleFilterChange} className="p-2 border border-gray-300 rounded">
+          <option value="">Select a heading to filter</option>
+          {data.map((item, index) => (
+            <option key={index} value={item.heading}>{item.heading}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Table */}
+      <div className="mt-4 w-full">
+        {filteredData.length > 0 ? (
+          <table className="min-w-full bg-white">
+            <thead>
+              <tr>
+                {/* Add your table headers here */}
+              </tr>
+            </thead>
+            <tbody>
+              {filteredData.map((row, rowIndex) => (
+                <tr key={rowIndex}>
+                  {/* Add your table row data here */}
+                  <td>
+                    <Button onClick={() => handleSaveRow(rowIndex)}>
+                      Save
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p className="text-gray-600 text-center">
+            No data to display. Upload files to populate the table.
+          </p>
+        )}
+      </div>
+
+      {/* Add Case Button */}
+      <div className="mt-4 flex justify-center">
+        <Button variant="secondary" onClick={handleAddRow}>
+          Add Case
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 export default function LegalDashboard() {
   const [cases, setCases] = useState<any[][]>([]);
   const [filteredCases, setFilteredCases] = useState<any[][]>([]);
@@ -103,7 +168,7 @@ export default function LegalDashboard() {
     <div className="min-h-screen bg-white text-black flex flex-col items-center justify-center">
       {/* Summary Cards */}
       <div className="flex flex-wrap justify-center gap-8 mt-20 lg:mt-32">
-        <div className="flex flex-col items-center justify-center bg-green-500 text-white rounded-xl p-6 w-64 h-48 shadow-lg">
+        <div className="flex flex-col items-center justify-center bg-blue-500 text-white rounded-xl p-6 w-64 h-48 shadow-lg">
           <h2 className="text-2xl font-bold">Total Cases</h2>
           <p className="text-4xl font-semibold">{cases.length - 1}</p>
         </div>
