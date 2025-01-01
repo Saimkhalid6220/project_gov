@@ -59,8 +59,6 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
 
   return (
     <div>
-      <h2 className="text-lg font-semibold mb-6 text-center">Filter Cases</h2>
-
       {/* Form for filtering */}
       <div className="space-y-4">
         {currentFields.map((header) => (
@@ -70,7 +68,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
               type="text"
               value={filterValues[header] || ""}
               onChange={(e) => handleFilterChange(header, e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               placeholder={`Filter by ${header}`}
             />
           </div>
@@ -81,7 +79,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
       <div className="mt-6 flex justify-between gap-4">
         <button
           onClick={goToPreviousPage}
-          className="w-full py-2 px-4 bg-gray-300 text-black rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          className="w-full py-2 px-4 hover:bg-gray-700 bg-gray-600 text-white rounded-md  focus:outline-none focus:ring-2 focus:ring-gray-800"
           disabled={currentPage === 1}
         >
           Previous
@@ -89,7 +87,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
 
         <button
           onClick={goToNextPage}
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full py-2 px-4 hover:bg-gray-700 bg-gray-600 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           disabled={currentPage === Math.ceil(headers.length / fieldsPerPage)}
         >
           Next
@@ -110,7 +108,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
       <div className="mt-4">
         <button
           onClick={handleRefreshFilters}
-          className="w-full py-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-red-500"
         >
           Refresh
         </button>

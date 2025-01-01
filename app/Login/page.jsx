@@ -26,8 +26,27 @@ export default function SignIn() {
   };
 
   return (
+    <>
+    
+{/*  */}
+
+<div className = "flex p-2 justify-between mt-auto mb-auto items-center border-b bg-white flex-wrap">
+      <div className="flex ml-4 items-center">
+        <img src="logo.png" alt="Logo" className="h-24" />
+        <div className="relative items-center mt-auto mb-auto flex justify-center text-base mx-auto hidden md:inline-flex">
+          <span className="rounded-md text-black text-center font-bold py-1 px-2 text-2xl">
+          Welcome To Legal Dashboard
+          </span>
+        </div>
+      </div>
+    </div>
+
+{/*  */}
+
+
     <div className="flex items-center justify-center min-h-screen  bg-white">
       <div className="bg-gray-200 p-8 rounded shadow-lg w-96">
+    
         <h1 className="text-2xl font-bold text-black mb-6 text-center">Login</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -56,5 +75,6 @@ export default function SignIn() {
         </form>
       </div>
     </div>
+    </>
   );
 }
