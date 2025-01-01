@@ -13,7 +13,7 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: "School Legal Dashboard",
-  description: "This website is proudly created by two dedicated individuals, Shaheer Yousuf (@shaheer__yousuf) and Saim Khalid (@i_saim_khalid). Follow them on Instagram for more updates!",
+  description: "This website is proudly created by three dedicated individuals, Shaheer Yousuf (@shaheer__yousuf),Emroze Khan (@notemrozekhan) and Saim Khalid (@i_saim_khalid). Follow them on Instagram to visualize your dreams into!",
 };
 
 export default function RootLayout({
