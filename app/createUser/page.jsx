@@ -1,6 +1,5 @@
 import React from 'react'
 import UserForm from '@/components/UserForm'
-import Nav from '@/components/Nav'
 
 const CreateUser = () => {
   return (

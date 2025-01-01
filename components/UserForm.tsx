@@ -14,7 +14,7 @@ const UserForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("/api/users", formData);
+      await axios.post("/api/Users", formData);
       // Handle success (e.g., redirect or show message)
     } catch (err) {
       setError("Error creating user");
