@@ -4,8 +4,7 @@ import bcrypt from "bcrypt";
 
 export async function POST(req) {
   try {
-    const body = await req.json();
-    const userData = body.formData;
+    const userData = await req.json();
 
     //Confirm data exists
     if (!userData?.email || !userData.password) {

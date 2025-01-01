@@ -19,6 +19,9 @@ const UserForm = () => {
     } catch (err) {
       setError("Error creating user");
     }
+    finally{
+      window.location.href="/"
+    }
   };
 
   const handleChange = (e) => {
