@@ -30,6 +30,9 @@ const UserForm = () => {
   };
 
   return (
+
+
+    
     <div className="flex items-center justify-center min-h-screen bg-white">
       <div className="bg-gray-200 p-8 rounded shadow-lg w-96">
         <h1 className="text-2xl font-bold text-black mb-6 text-center">Create User</h1>

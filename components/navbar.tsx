@@ -15,7 +15,7 @@ export default async function Navbar() {
     <>
 
 
-      <div className="flex p-2  justify-between mt-auto mb-auto items-center border-b bg-gray-200 flex-wrap">
+      <div className="flex p-2  justify-between mt-auto mb-auto items-center border-b bg-white flex-wrap">
         <div className="flex ml-4 items-center">
 
           <img src="logo.png" alt="Logo" className="h-24" />

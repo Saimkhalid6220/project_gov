@@ -230,7 +230,7 @@ const ExcelComponent = () => {
               setShowModal={setShowModal}
             />
             <div className="mt-4 flex justify-end gap-2">
-              <Button onClick={handleCloseFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+              <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white text-white px-4 py-2 rounded">
                 Close
               </Button>
             </div>
@@ -246,9 +246,6 @@ const ExcelComponent = () => {
         </Button>
         <Search onSearch={handleSearch} />
         <div className="flex gap-2">
-          <Button onClick={handleSaveChanges} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-            Save Changes
-          </Button>
           <Button onClick={handleAddCaseClick} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
             Add Case
           </Button>
