@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import Search from "./search";
 import { Trash2, Edit } from "lucide-react";
 import AddCaseModal from "@/components/AddCaseModal";
+import styles from './excel.module.css';
 
 const ExcelComponent = () => {
   interface Case {
@@ -217,7 +218,7 @@ const ExcelComponent = () => {
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
   <table ref={tableRef} className="w-full border-collapse table-fixed">
     <thead>
-      <tr>
+      <tr className={styles.hidden}>
         {headers.map((header, index) => (
           <th
             key={index}
@@ -230,15 +231,19 @@ const ExcelComponent = () => {
             {header}
           </th>
         ))}
-        <th
-          className="border border-gray-300 px-2 py-4 text-sm font-semibold text-black bg-gray-100 text-center break-words"
-          style={{
-            wordWrap: "break-word", // Allow wrapping within words
-            whiteSpace: "normal",  // Enable multi-line text
-          }}
-        >
-          Actions
-        </th>
+      </tr>
+      <tr>
+        <th>SR. NO</th>
+        <th>DATE OF HEARING</th>
+        <th>CP/SA /SUIT</th>
+        <th>SUBJECT</th>
+        <th>PETITIONER</th>
+        <th>COURT</th>
+        <th>CONCERNED OFFICE</th>
+        <th>COMMENTS FILED (Y/N)</th>
+        <th>LAST HEARING DATE</th>
+        <th>REMARKS</th>
+        <th>ACTIONS</th>
       </tr>
     </thead>
     <tbody>
