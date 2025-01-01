@@ -6,6 +6,7 @@ import Search from "./search";
 import { Trash2, Edit } from "lucide-react";
 import AddCaseModal from "@/components/AddCaseModal";
 import styles from './excel.module.css';
+import Progress from "@/components/features/loader"
 import Filter from "./filter";
 
 const ExcelComponent = () => {
@@ -40,6 +41,7 @@ const ExcelComponent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/CourtCases');
         const json = await response.json();
@@ -199,6 +201,12 @@ const ExcelComponent = () => {
     setFilterModalOpen(false);
   };
 
+  if (loading) {
+    return (
+   <Progress/>
+   );
+  }
+
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6">
       
@@ -246,6 +254,9 @@ const ExcelComponent = () => {
         </Button>
         <Search onSearch={handleSearch} />
         <div className="flex gap-2">
+          <Button onClick={handleSaveChanges} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+            Save Changes
+          </Button>
           <Button onClick={handleAddCaseClick} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
             Add Case
           </Button>
@@ -351,14 +362,9 @@ const ExcelComponent = () => {
     </tbody>
   </table>
 </div>
+
     </div>
-
-
-
-
   );
 };
 
 export default ExcelComponent;
-
-// hello
