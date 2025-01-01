@@ -64,7 +64,7 @@ const UserForm = () => {
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+            className="w-full  hover:bg-gray-700 bg-gray-600 text-white py-2 rounded "
           >
             Create User
           </button>

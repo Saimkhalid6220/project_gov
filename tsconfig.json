@@ -5,10 +5,12 @@
       "dom.iterable",
       "esnext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
+   "strict": false, // Turns off all strict type-checking options
+    "noImplicitAny": false, // Allows variables to have 'any' type
+    "skipLibCheck": true, // Skips type checking for all declaration files
+    "allowJs": true, // Allows importing .js files
+    "noEmit": true, // Prevents emitting compiled files
+    "checkJs": false ,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -33,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/options.js", "app/api/Users/route.js", "components/AuthProviders.js", "components/UserForm.tsx", "node_modules/@alloc/signout.tsx"  ],
+, "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/options.js", "app/api/Users/route.js", "components/AuthProviders.js", "components/UserForm.tsx", "node_modules/@alloc/signout.tsx", "components/features/excel.jsx"  ],
   "exclude": [
     "node_modules"
   ]

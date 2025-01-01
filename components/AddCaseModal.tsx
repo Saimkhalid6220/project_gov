@@ -1,4 +1,6 @@
+'use client'
 import axios from "axios";
+import { redirect } from "next/navigation";
 import React, { useState } from "react";
 
 const AddCaseModal = ({ isOpen, onClose }) => {
@@ -28,6 +30,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
     } catch (err) {
       setError("Error creating user");
     }
+    window.location.href="/"
   };
 
   const handleChange = (e) => {

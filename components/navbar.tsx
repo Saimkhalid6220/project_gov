@@ -32,7 +32,7 @@ export default async function Navbar() {
 
         <div className="md:ml-auto flex mt-auto mb-auto mr-4 flex-wrap items-center text-base justify-center">
           <Link href="/createUser">
-            <button className="inline-flex items-center bg-green-500 text-white border-0 py-1 px-3 focus:outline-none hover:bg-green-600 rounded text-base mt-4 md:mt-0 mr-2">
+          <button className="inline-flex items-center bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0 mr-2">
               Create User
               <svg
                 fill="none"
@@ -48,7 +48,7 @@ export default async function Navbar() {
             </button>
           </Link>
           <Link href="./Logout">
-            <button className="inline-flex items-center bg-green-500 text-white border-0 py-1 px-3 focus:outline-none hover:bg-green-600 rounded text-base mt-4 md:mt-0">
+            <button className="inline-flex items-center  bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0">
               Logout
               <svg
                 fill="none"

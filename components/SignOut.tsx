@@ -15,9 +15,9 @@ const SignOut = () => {
         <p className="text-center text-black mb-6">Are you sure you want to Log out?</p>
         <button
           onClick={handleSignOut}
-          className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+          className="w-full  hover:bg-gray-700 bg-gray-600 text-white py-2 rounded "
         >
-          Log Out
+          Logout
         </button>
       </div>
     </div>

@@ -36,7 +36,7 @@ export default function SignIn() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full p-2 border rounded text-black focus:outline-none focus:ring focus:ring-green-500 bg-white"
+            className="w-full p-2 border rounded text-black focus:outline-none focus:ring focus:ring-gray-500 bg-white"
           />
           <input
             type="password"
@@ -44,12 +44,12 @@ export default function SignIn() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full p-2 border rounded text-black focus:outline-none focus:ring focus:ring-green-500 bg-white"
+            className="w-full p-2 border rounded text-black focus:outline-none focus:ring focus:ring-gray-500 bg-white"
           />
           {error && <p className="text-red-500 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+            className="w-full  hover:bg-gray-700 bg-gray-600 text-white py-2 rounded "
           >
             Login
           </button>
