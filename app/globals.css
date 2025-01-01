@@ -66,6 +66,11 @@
     }
   }
 
+  .hidden {
+    display: none;
+  }
+
+
   @layer base {
     * {
       @apply border-border;
