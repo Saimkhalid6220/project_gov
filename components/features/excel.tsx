@@ -6,6 +6,7 @@ import Search from "./search";
 import { Trash2, Edit } from "lucide-react";
 import AddCaseModal from "@/components/AddCaseModal";
 import styles from './excel.module.css';
+import Filter from "./filter";
 
 const ExcelComponent = () => {
   interface Case {
@@ -200,6 +201,7 @@ const ExcelComponent = () => {
       </div>
 
       <div className="flex items-center justify-center gap-4 mb-6">
+        <Filter/>
         <Button onClick={scrollToBottom} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
           Scroll to Bottom
         </Button>
