@@ -60,22 +60,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
   return (
     <div>
       {/* Form for filtering */}
-      <div className="space-y-4">
-        {currentFields.map((header) => (
-          <div key={header}>
-        <label className="block text-sm font-medium text-gray-700">
-          {header.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
-        </label>
-        <input
-          type="text"
-          value={filterValues[header] || ""}
-          onChange={(e) => handleFilterChange(header, e.target.value)}
-          className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          placeholder={`Filter by ${header.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}`}
-        />
-          </div>
-        ))}
-      </div>
+
 
       {/* Pagination and action buttons */}
       <div className="mt-6 flex justify-between gap-4">
