@@ -63,18 +63,19 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
       <div className="space-y-4">
         {currentFields.map((header) => (
           <div key={header}>
-            <label className="block text-sm font-medium text-gray-700">{header}</label>
-            <input
-              type="text"
-              value={filterValues[header] || ""}
-              onChange={(e) => handleFilterChange(header, e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              placeholder={`Filter by ${header}`}
-            />
+        <label className="block text-sm font-medium text-gray-700">
+          {header.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}
+        </label>
+        <input
+          type="text"
+          value={filterValues[header] || ""}
+          onChange={(e) => handleFilterChange(header, e.target.value)}
+          className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          placeholder={`Filter by ${header.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())}`}
+        />
           </div>
         ))}
       </div>
-
       {/* Pagination and action buttons */}
       <div className="mt-6 flex justify-between gap-4">
         <button
@@ -108,7 +109,7 @@ const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setSh
       <div className="mt-4">
         <button
           onClick={handleRefreshFilters}
-          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           Refresh
         </button>
