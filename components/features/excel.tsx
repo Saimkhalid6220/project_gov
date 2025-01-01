@@ -6,6 +6,7 @@ import Search from "./search";
 import { Trash2, Edit } from "lucide-react";
 import AddCaseModal from "@/components/AddCaseModal";
 import styles from './excel.module.css';
+import Progress from "@/components/features/loader"
 import Filter from "./filter";
 
 const ExcelComponent = () => {
@@ -40,6 +41,7 @@ const ExcelComponent = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setLoading(true);
       try {
         const response = await fetch('/api/CourtCases');
         const json = await response.json();
@@ -199,6 +201,12 @@ const ExcelComponent = () => {
     setFilterModalOpen(false);
   };
 
+  if (loading) {
+    return (
+   <Progress/>
+   );
+  }
+
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6">
       
@@ -352,13 +360,8 @@ const ExcelComponent = () => {
   </table>
 </div>
     </div>
-
-
-
-
+  
   );
 };
-
+// This website is proudly created by three dedicated individuals, Shaheer Yousuf (@shaheer__yousuf),Emroze Khan (@notemrozekhan) and Saim Khalid (@i_saim_khalid). Follow them on Instagram to visualize your dreams into!
 export default ExcelComponent;
-
-// hello
