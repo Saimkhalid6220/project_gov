@@ -33,6 +33,10 @@ const ExcelComponent = () => {
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+
+
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -55,6 +59,9 @@ const ExcelComponent = () => {
         }
       } catch (error) {
         console.error('Error:', error);
+      }
+      finally {
+        setLoading(false); // Set loading to false after data is fetched
       }
     };
     fetchData();
@@ -174,6 +181,7 @@ const ExcelComponent = () => {
   };
 
   const [isModalOpen, setModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   const handleAddCaseClick = () => {
     setModalOpen(true);
@@ -183,8 +191,17 @@ const ExcelComponent = () => {
     setModalOpen(false);
   };
 
+  const handleOpenFilterModal = () => {
+    setFilterModalOpen(true);
+  };
+
+  const handleCloseFilterModal = () => {
+    setFilterModalOpen(false);
+  };
+
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6">
+      
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
           <h3 className="text-sm font-medium text-black">Total Cases</h3>
@@ -201,7 +218,29 @@ const ExcelComponent = () => {
       </div>
 
       <div className="flex items-center justify-center gap-4 mb-6">
-        <Filter/>
+  {/* Filter Modal */}
+  {isFilterModalOpen?(
+        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-lg font-semibold mb-4">Filter Cases</h2>
+            <Filter
+              headers={headers}
+              cases={cases}
+              setFilteredCases={setFilteredCases}
+              setShowModal={setShowModal}
+            />
+            <div className="mt-4 flex justify-end gap-2">
+              <Button onClick={handleCloseFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      ):(
+        <Button onClick={handleOpenFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+          Filter
+        </Button>
+      )}
         <Button onClick={scrollToBottom} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
           Scroll to Bottom
         </Button>

@@ -1,108 +1,120 @@
-"use client";
-
-import * as React from "react";
-import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import React, { useState } from "react";
 
 interface FilterProps {
   headers: string[];
-  selectedColumns: string[];
-  setSelectedColumns: React.Dispatch<React.SetStateAction<string[]>>;
+  cases: any[];
+  setFilteredCases: React.Dispatch<React.SetStateAction<any[]>>;
+  setShowModal: React.Dispatch<React.SetStateAction<boolean>>; // Pass setShowModal to close the modal
 }
 
-const Select = SelectPrimitive.Root;
-const SelectGroup = SelectPrimitive.Group;
-const SelectValue = SelectPrimitive.Value;
+const Filter: React.FC<FilterProps> = ({ headers, cases, setFilteredCases, setShowModal }) => {
+  const [filterValues, setFilterValues] = useState<{ [key: string]: string }>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const fieldsPerPage = 3; // Number of fields to show per page
 
-const SelectTrigger = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger
-    ref={ref}
-    className={cn(
-      "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
-      className
-    )}
-    {...props}
-  >
-    {children}
-    <ChevronDown className="ml-2 h-4 w-4" />
-  </SelectPrimitive.Trigger>
-));
+  const currentFields = headers.slice(
+    (currentPage - 1) * fieldsPerPage,
+    currentPage * fieldsPerPage
+  );
 
-const SelectContent = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Content
-    ref={ref}
-    className={cn(
-      "relative z-50 min-w-[8rem] overflow-hidden rounded-md border bg-popover p-1 text-popover-foreground shadow-md",
-      className
-    )}
-    {...props}
-  >
-    <SelectPrimitive.Viewport className="p-1">{children}</SelectPrimitive.Viewport>
-  </SelectPrimitive.Content>
-));
-
-const SelectItem = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Item
-    ref={ref}
-    className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      className
-    )}
-    {...props}
-  >
-    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
-      <SelectPrimitive.ItemIndicator>
-        <Check className="h-4 w-4" />
-      </SelectPrimitive.ItemIndicator>
-    </span>
-    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-  </SelectPrimitive.Item>
-));
-
-const Filter: React.FC<FilterProps> = ({ headers = [], selectedColumns = [], setSelectedColumns }) => {
-  const handleColumnSelection = (column: string) => {
-    setSelectedColumns((prevSelectedColumns) =>
-      prevSelectedColumns.includes(column)
-        ? prevSelectedColumns.filter((col) => col !== column)
-        : [...prevSelectedColumns, column]
-    );
+  const handleFilterChange = (header: string, value: string) => {
+    setFilterValues((prevValues) => ({
+      ...prevValues,
+      [header]: value,
+    }));
   };
 
-  const handleRemoveAllFilters = () => {
-    setSelectedColumns([]);
+  const handleApplyFilter = () => {
+    let filtered = [...cases];
+
+    for (const [header, value] of Object.entries(filterValues)) {
+      if (value) {
+        filtered = filtered.filter((row) =>
+          row[header]?.toString().toLowerCase().includes(value.toLowerCase())
+        );
+      }
+    }
+
+    setFilteredCases(filtered);
+    setShowModal(false); // Close the modal when "Done" is clicked
+  };
+
+  const handleRefreshFilters = () => {
+    setFilterValues({}); // Reset all filters
+    setFilteredCases(cases); // Reset the filtered cases to show all
+    setShowModal(false); // Close the modal when "Refresh" is clicked
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < Math.ceil(headers.length / fieldsPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
   };
 
   return (
     <div>
-      <Select>
-        <SelectTrigger>Select Columns</SelectTrigger>
-        <SelectContent>
-          {headers.filter(header => header !== "SR. NO" && header !== "ACTIONS").map((header) => (
-            <SelectItem key={header} onClick={() => handleColumnSelection(header)}>
-              <input
-                type="checkbox"
-                checked={selectedColumns.includes(header)}
-                readOnly
-              />
-              {header}
-            </SelectItem>
-          ))}
-          <SelectItem onClick={handleRemoveAllFilters}>
-            <input type="checkbox" checked={selectedColumns.length === 0} readOnly />
-            Remove All Filters
-          </SelectItem>
-        </SelectContent>
-      </Select>
+      <h2 className="text-lg font-semibold mb-6 text-center">Filter Cases</h2>
+
+      {/* Form for filtering */}
+      <div className="space-y-4">
+        {currentFields.map((header) => (
+          <div key={header}>
+            <label className="block text-sm font-medium text-gray-700">{header}</label>
+            <input
+              type="text"
+              value={filterValues[header] || ""}
+              onChange={(e) => handleFilterChange(header, e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              placeholder={`Filter by ${header}`}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination and action buttons */}
+      <div className="mt-6 flex justify-between gap-4">
+        <button
+          onClick={goToPreviousPage}
+          className="w-full py-2 px-4 bg-gray-300 text-black rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+
+        <button
+          onClick={goToNextPage}
+          className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          disabled={currentPage === Math.ceil(headers.length / fieldsPerPage)}
+        >
+          Next
+        </button>
+      </div>
+
+      {/* Done button to apply filters (visible on all pages) */}
+      <div className="mt-4">
+        <button
+          onClick={handleApplyFilter}
+          className="w-full py-2 px-4 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
+        >
+          Done
+        </button>
+      </div>
+
+      {/* Refresh button to reset filters */}
+      <div className="mt-4">
+        <button
+          onClick={handleRefreshFilters}
+          className="w-full py-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+        >
+          Refresh
+        </button>
+      </div>
     </div>
   );
 };
