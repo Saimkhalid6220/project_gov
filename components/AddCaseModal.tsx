@@ -45,7 +45,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div className="relative bg-white rounded-lg p-8 w-full max-w-xl shadow-xl">
+  <div className="relative bg-gray-50 rounded-lg p-8 w-full max-w-xl shadow-xl">
     <button
       className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
       onClick={onClose}
@@ -195,7 +195,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
               <button
                 type="button"
                 onClick={handleNext}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+                className="bg-blue-500 text-white text-sm py-2 px-8 rounded-lg hover:bg-blue-600"
               >
                 Next
               </button>
