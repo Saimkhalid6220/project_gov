@@ -8,6 +8,8 @@ import AddCaseModal from "@/components/AddCaseModal";
 import styles from './excel.module.css';
 import Progress from "@/components/features/loader"
 import Filter from "./filter";
+import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
 const ExcelComponent = () => {
   interface Case {
@@ -22,6 +24,10 @@ const ExcelComponent = () => {
     last_hearing_date: string;
     remarks: string;
   }
+  
+  const {toast} = useToast();
+
+  const {data:session} = useSession({required:true})
 
   const [cases, setCases] = useState<Case[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -38,6 +44,7 @@ const ExcelComponent = () => {
 
 
   const [loading, setLoading] = useState<boolean>(true);
+  const [error,setError] = useState()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,6 +114,11 @@ const ExcelComponent = () => {
   };
 
   const handleSave = async (rowIndex: number) => {
+    // Check if the user is an admin
+      toast({
+        title: "saving in the database",
+        description: "please wait",
+      });
     try {
       // Prepare the data to send to the API
       const updatedData = editedData as Case;
@@ -139,11 +151,32 @@ const ExcelComponent = () => {
         console.error('Error updating case:', data.message);
       }
     } catch (error) {
+      setError(error)
       console.error('Error:', error);
+    } finally{
+      if(!error){
+        toast({
+          title: "success",
+          description: "your data has been updated",
+          variant:"success"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "error updating ,please try again",
+          variant:"destructive"
+        });
+      }
     }
   };
 
   const handleDelete = async (rowIndex: number) => {
+
+    toast({
+      title: "deleting from the database",
+      description: "please wait",
+    })
+
     try {
       const sr_no = cases[rowIndex].sr_no;
 
@@ -169,7 +202,22 @@ const ExcelComponent = () => {
         console.error('Error deleting case:', data.message);
       }
     } catch (error) {
+      setError(error)
       console.error('Error:', error);
+    } finally{
+      if(!error){
+        toast({
+          title: "success",
+          description: "your data has been deleted",
+          variant:"success"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "error deleting ,please try again",
+          variant:"destructive"
+        });
+      }
     }
   };
 
@@ -286,103 +334,112 @@ const ExcelComponent = () => {
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-        <table ref={tableRef} className="w-full border-collapse table-fixed">
-          <thead>
-            <tr className={styles.hidden}>
-              {headers.map((header, index) => (
-                <th
-                  key={index}
-                  className="border border-gray-300 px-2 py-4 text-sm font-semibold text-black bg-gray-100 text-center break-words"
-                  style={{
-                    wordWrap: "break-word", // Allow wrapping within words
-                    whiteSpace: "normal",  // Enable multi-line text
-                  }}
-                >
-                  {header}
-                </th>
-              ))}
-            </tr>
-            <tr>
-              <th>SR. NO</th>
-              <th>DATE OF HEARING</th>
-              <th>CP/SA /SUIT</th>
-              <th>SUBJECT</th>
-              <th>PETITIONER</th>
-              <th>COURT</th>
-              <th>CONCERNED OFFICE</th>
-              <th>COMMENTS FILED (Y/N)</th>
-              <th>LAST HEARING DATE</th>
-              <th>REMARKS</th>
-              <th>ACTIONS</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredCases.map((row, rowIndex) => (
+  <table ref={tableRef} className="w-full border-collapse table-fixed">
+    <thead>
+      <tr className={styles.hidden}>
+        {headers.map((header, index) => (
+          <th
+            key={index}
+            className="border border-gray-300 px-2 py-4 text-sm font-semibold text-black bg-gray-100 text-center break-words"
+            style={{
+              wordWrap: "break-word", // Allow wrapping within words
+              whiteSpace: "normal",  // Enable multi-line text
+            }}
+          >
+            {header}
+          </th>
+        ))}
+      </tr>
+      <tr>
+        <th>SR. NO</th>
+        <th>DATE OF HEARING</th>
+        <th>CP/SA /SUIT</th>
+        <th>SUBJECT</th>
+        <th>PETITIONER</th>
+        <th>COURT</th>
+        <th>CONCERNED OFFICE</th>
+        <th>COMMENTS FILED (Y/N)</th>
+        <th>LAST HEARING DATE</th>
+        <th>REMARKS</th>
+        {session?.user?.role && (
 
-              <tr
-                key={rowIndex}
-                className={`${getRowClass(row.date_of_hearing)} ${editingRow === rowIndex ? "bg-white text-black" : ""
-                  }`}
-              >
-                {headers.map((header, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    className="border border-gray-300 p-2 text-sm text-black"
-                  >
-                    {editingRow === rowIndex ? (
-                      <input
-                        type="text"
-                        value={editedData[header] || row[header] || ""}
-                        onChange={(e) => {
-                          const newData = { ...editedData };
-                          newData[header] = e.target.value;
-                          setEditedData(newData);
-                        }}
-                        className="w-full p-1 border rounded bg-white text-black"
-                      />
-                    ) : (
-                      row[header] || "-" // Add a hyphen if the cell value is empty or null
-                    )}
-                  </td>
-                ))}
-                <td className="border border-gray-300 p-2">
-                  <div className="flex justify-center gap-2">
-                    {editingRow === rowIndex ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSave(rowIndex)}
-                        className="text-green-600 hover:bg-gray-50"
-                      >
-                        Save
-                      </Button>
-                    ) : (
-                      <>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-black hover:text-green-800 hover:bg-gray-50"
-                          onClick={() => handleEdit(rowIndex)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="text-black hover:text-red-600 hover:bg-gray-50"
-                          onClick={() => handleDelete(rowIndex)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          <th>ACTIONS</th>
+        )
+        }
+      </tr>
+    </thead>
+    <tbody>
+      {filteredCases.map((row, rowIndex) => (
+        <tr
+          key={rowIndex}
+          className={`hover:bg-gray-50 ${
+            editingRow === rowIndex ? "bg-white text-black" : ""
+          }`}
+        >
+          {headers.map((header, cellIndex) => (
+            <td
+              key={cellIndex}
+              className="border border-gray-300 p-2 text-sm text-black"
+            >
+              {editingRow === rowIndex ? (
+                <input
+                  type="text"
+                  value={editedData[header] || row[header] || ""}
+                  onChange={(e) => {
+                    const newData = { ...editedData };
+                    newData[header] = e.target.value;
+                    setEditedData(newData);
+                  }}
+                  className="w-full p-1 border rounded bg-white text-black"
+                />
+              ) : (
+                row[header] || "-" // Add a hyphen if the cell value is empty or null
+              )}
+            </td>
+          ))}
+          { session?.user?.role && (
+
+            
+            <td className="border border-gray-300 p-2">
+            <div className="flex justify-center gap-2">
+              {editingRow === rowIndex ? (
+                <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSave(rowIndex)}
+                className="text-green-600 hover:bg-gray-50"
+                >
+                  Save
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-black hover:text-green-800 hover:bg-gray-50"
+                    onClick={() => handleEdit(rowIndex)}
+                    >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-black hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => handleDelete(rowIndex)}
+                    >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
+            </div>
+          </td>
+            )
+            }
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
     </div>
 
   );

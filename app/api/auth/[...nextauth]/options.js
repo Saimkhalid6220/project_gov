@@ -48,8 +48,11 @@ export const options = {
               if (match) {
                 console.log("Good Pass");
                 delete foundUser.password;
-  
-                foundUser["role"] = "Unverified Email";
+              if (foundUser.isAdmin) {
+                foundUser["role"] = true;
+              } else {
+                foundUser["role"] = false;
+              }
                 return foundUser;
               }
             }
