@@ -123,7 +123,7 @@ const ExcelComponent = () => {
       // Prepare the data to send to the API
       const updatedData = editedData as Case;
       const updatedCase = { sr_no: cases[rowIndex].sr_no, updateData: updatedData };
-  
+
       // Send the update request to the API
       const response = await fetch('/api/CourtCases', {
         method: 'PATCH',
@@ -132,16 +132,16 @@ const ExcelComponent = () => {
         },
         body: JSON.stringify(updatedCase),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // Update the cases state with the new data if the request was successful
         const updatedCases = [...cases];
         updatedCases[rowIndex] = updatedData;
         setCases(updatedCases);
         setFilteredCases(updatedCases);
-  
+
         // Close the editing state
         setEditingRow(null);
         setEditedData({});
@@ -169,7 +169,7 @@ const ExcelComponent = () => {
       }
     }
   };
-  
+
   const handleDelete = async (rowIndex: number) => {
 
     toast({
@@ -179,7 +179,7 @@ const ExcelComponent = () => {
 
     try {
       const sr_no = cases[rowIndex].sr_no;
-  
+
       // Send the DELETE request to the API
       const response = await fetch('/api/CourtCases', {
         method: 'DELETE',
@@ -188,9 +188,9 @@ const ExcelComponent = () => {
         },
         body: JSON.stringify({ sr_no }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         // Remove the deleted case from the state
         const updatedCases = cases.filter((_, index) => index !== rowIndex);
@@ -220,7 +220,7 @@ const ExcelComponent = () => {
       }
     }
   };
-  
+
 
   const scrollToBottom = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
@@ -249,15 +249,39 @@ const ExcelComponent = () => {
     setFilterModalOpen(false);
   };
 
+
+
   if (loading) {
     return (
-   <Progress/>
-   );
+      <Progress />
+    );
   }
+
+  const getDateDifference = (hearingDate: string): number => {
+    const today = new Date();
+    const hearing = new Date(hearingDate);
+    const difference = (hearing.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    return difference;
+  };
+
+  const getRowClass = (hearingDate: string) => {
+    const diff = getDateDifference(hearingDate);
+    if (diff <= 7 && diff > 3) {
+      return "bg-yellow-200"; // Yellow if within a week
+    } else if (diff <= 3 && diff >= 2) {
+      return "bg-red-200"; // Red if within 3 to 2 days
+    }
+    return ""; // No class if outside these ranges
+  };
+
+  if (loading) {
+    return <Progress />;
+  }
+
 
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6">
-      
+
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
           <h3 className="text-sm font-medium text-black">Total Cases</h3>
@@ -274,29 +298,29 @@ const ExcelComponent = () => {
       </div>
 
       <div className="flex items-center justify-center gap-4 mb-6">
-  {/* Filter Modal */}
-  {isFilterModalOpen?(
-        <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
-            <h2 className="text-lg font-semibold mb-4">Filter Cases</h2>
-            <Filter
-              headers={headers}
-              cases={cases}
-              setFilteredCases={setFilteredCases}
-              setShowModal={setShowModal}
-            />
-            <div className="mt-4 flex justify-end gap-2">
-              <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white text-white px-4 py-2 rounded">
-                Close
-              </Button>
+        {/* Filter Modal */}
+        {isFilterModalOpen ? (
+          <div className="fixed inset-0 bg-gray-700 bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+              <h2 className="text-lg font-semibold mb-4">Filter Cases</h2>
+              <Filter
+                headers={headers}
+                cases={cases}
+                setFilteredCases={setFilteredCases}
+                setShowModal={setShowModal}
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white text-white px-4 py-2 rounded">
+                  Close
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      ):(
-        <Button onClick={handleOpenFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
-          Filter
-        </Button>
-      )}
+        ) : (
+          <Button onClick={handleOpenFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+            Filter
+          </Button>
+        )}
         <Button onClick={scrollToBottom} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
           Scroll to Bottom
         </Button>
@@ -417,7 +441,7 @@ const ExcelComponent = () => {
   </table>
 </div>
     </div>
-  
+
   );
 };
 // This website is proudly created by three dedicated individuals, Shaheer Yousuf (@shaheer__yousuf),Emroze Khan (@notemrozekhan) and Saim Khalid (@i_saim_khalid). Follow them on Instagram to visualize your dreams into!
