@@ -334,16 +334,16 @@ const ExcelComponent = () => {
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-  <table ref={tableRef} className="w-full border-collapse table-fixed">
-    <thead>
-      <tr className={styles.hidden}>
-        {headers.map((header, index) => (
-          <th
-            key={index}
-            className="border border-gray-300 px-2 py-4 text-sm font-semibold text-black bg-gray-100 text-center break-words"
-            style={{
-              wordWrap: "break-word", // Allow wrapping within words
-              whiteSpace: "normal",  // Enable multi-line text
+      <table ref={tableRef} className="w-full border-collapse table-fixed">
+          <thead>
+            <tr className={styles.hidden}>
+              {headers.map((header, index) => (
+                <th
+                  key={index}
+                  className="border border-gray-300 px-2 py-4 text-sm font-semibold text-black bg-gray-100 text-center break-words"
+                  style={{
+                    wordWrap: "break-word", // Allow wrapping within words
+                    whiteSpace: "normal",  // Enable multi-line text
             }}
           >
             {header}
@@ -371,11 +371,10 @@ const ExcelComponent = () => {
     <tbody>
       {filteredCases.map((row, rowIndex) => (
         <tr
-          key={rowIndex}
-          className={`hover:bg-gray-50 ${
-            editingRow === rowIndex ? "bg-white text-black" : ""
+        key={rowIndex}
+        className={`${getRowClass(row.date_of_hearing)} ${editingRow === rowIndex ? "bg-white text-black" : ""
           }`}
-        >
+      >
           {headers.map((header, cellIndex) => (
             <td
               key={cellIndex}
