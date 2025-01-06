@@ -423,24 +423,41 @@ const ExcelComponent = () => {
         )
         }
       </tr>
-          </thead>
-          <tbody>
-            {filteredCases.map((row, rowIndex) => (
-              <tr key={rowIndex} className={hover:bg-gray-50 ${editingRow === rowIndex ? "bg-white text-black" : ""}}>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["SR.NO"] }}>{rowIndex + 1}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["DATE OF HEARING"] }}>{row.date_of_hearing}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["CP/SA /SUIT"] }}>{row.cp_sa_suit}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["SUBJECT"] }}>{row.subject}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["PETITIONER"] }}>{row.petitioner}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["COURT"] }}>{row.court}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["CONCERNED OFFICE"] }}>{row.concerned_office}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["COMMENTS FILED (Y/N)"] }}>{row.comments}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["LAST HEARING DATE"] }}>{row.last_hearing_date}</td>
-                <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["REMARKS"] }}>{row.remarks}</td>
-                { session?.user?.role && (
-                <td className="border border-gray-300 p-2" style={{ width: columnWidths["ACTIONS"] }}>
-                  <div className="flex justify-center gap-2">
-                  
+
+    </thead>
+    <tbody>
+      {filteredCases.map((row, rowIndex) => (
+        <tr
+        key={rowIndex}
+        className={`${getRowClass(row.date_of_hearing)} ${editingRow === rowIndex ? "bg-white text-black" : ""
+          }`}
+      >
+          {headers.map((header, cellIndex) => (
+            <td
+              key={cellIndex}
+              className="border border-gray-300 p-2 text-sm text-black"
+            >
+              {editingRow === rowIndex ? (
+                <input
+                  type="text"
+                  value={editedData[header] || row[header] || ""}
+                  onChange={(e) => {
+                    const newData = { ...editedData };
+                    newData[header] = e.target.value;
+                    setEditedData(newData);
+                  }}
+                  className="w-full p-1 border rounded bg-white text-black"
+                />
+              ) : (
+                row[header] || "-" // Add a hyphen if the cell value is empty or null
+              )}
+            </td>
+          ))}
+          { session?.user?.role && (
+
+            
+            <td className="border border-gray-300 p-2">
+            <div className="flex justify-center gap-2">
               {editingRow === rowIndex ? (
                 <Button
                 variant="ghost"
