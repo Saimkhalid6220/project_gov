@@ -10,6 +10,8 @@ import styles from './excel.module.css';
 import Progress from "@/components/features/loader";
 import Filter from "./filter";
 import { PDFDocument } from 'pdf-lib';
+import { useSession } from "next-auth/react";
+import { useToast } from "@/hooks/use-toast";
 
 const ExcelComponent = () => {
   interface Case {
@@ -25,6 +27,10 @@ const ExcelComponent = () => {
     pdf_url?: string;
     status?: string;
   }
+  
+  const {toast} = useToast();
+
+  const {data:session} = useSession({required:true})
 
   const [cases, setCases] = useState<Case[]>([]);
   const [filteredCases, setFilteredCases] = useState<Case[]>([]);
@@ -53,7 +59,6 @@ const ExcelComponent = () => {
     "UPLOAD PDF",
     "VIEW PDF"
   ];
-
   const columnWidths = {
     "SR.NO": "50px",
     "DATE OF HEARING": "150px",
@@ -69,6 +74,8 @@ const ExcelComponent = () => {
     "UPLOAD PDF": "100px",
     "VIEW PDF": "100px"
   };
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error,setError] = useState()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -107,14 +114,100 @@ const ExcelComponent = () => {
     setFilteredCases(filtered);
   };
 
+
+  const totalCases = cases.length;
+
+  const activeCases = cases.filter(row => {
+    if (remarksIndex !== null) {
+      const value = row[headers[remarksIndex]]?.toString().toLowerCase().trim() || '';
+      return value === 'pending' || value === '' || value === '-';
+    }
+    return false;
+  }).length;
+
+  const closedCases = totalCases - activeCases;
+
+  const handleEdit = (rowIndex: number) => {
+    setEditingRow(rowIndex);
+    setEditedData(filteredCases[rowIndex]);
+  };
+
+  const handleSave = async (rowIndex: number) => {
+    // Check if the user is an admin
+      toast({
+        title: "saving in the database",
+        description: "please wait",
+      });
+    try {
+      // Prepare the data to send to the API
+      const updatedData = editedData as Case;
+      const updatedCase = { sr_no: cases[rowIndex].sr_no, updateData: updatedData };
+
+      // Send the update request to the API
+      const response = await fetch('/api/CourtCases', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedCase),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update the cases state with the new data if the request was successful
+        const updatedCases = [...cases];
+        updatedCases[rowIndex] = updatedData;
+        setCases(updatedCases);
+        setFilteredCases(updatedCases);
+
+        // Close the editing state
+        setEditingRow(null);
+        setEditedData({});
+        handleSaveChanges(); // Optionally save changes to localStorage
+      } else {
+        // If the API returns an error, show a message
+        console.error('Error updating case:', data.message);
+      }
+    } catch (error) {
+      setError(error)
+      console.error('Error:', error);
+    } finally{
+      if(!error){
+        toast({
+          title: "success",
+          description: "your data has been updated",
+          variant:"success"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "error updating ,please try again",
+          variant:"destructive"
+        });
+      }
+    }
+  };
+
   const handleDelete = async (rowIndex: number) => {
+
+    toast({
+      title: "deleting from the database",
+      description: "please wait",
+    })
+
     try {
       const caseToDelete = cases[rowIndex];
+      const sr_no = cases[rowIndex].sr_no;
+
+      // Send the DELETE request to the API
       const response = await fetch('/api/CourtCases', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sr_no: caseToDelete.sr_no }),
       });
+
+      const data = await response.json();
 
       if (response.ok) {
         const updatedCases = cases.filter((_, index) => index !== rowIndex);
@@ -124,7 +217,22 @@ const ExcelComponent = () => {
         console.error('Error deleting case');
       }
     } catch (error) {
+      setError(error)
       console.error('Error:', error);
+    } finally{
+      if(!error){
+        toast({
+          title: "success",
+          description: "your data has been deleted",
+          variant:"success"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "error deleting ,please try again",
+          variant:"destructive"
+        });
+      }
     }
   };
 
@@ -195,9 +303,35 @@ const ExcelComponent = () => {
     }
   };
 
+
+
+  if (loading) {
+    return (
+      <Progress />
+    );
+  }
+
+  const getDateDifference = (hearingDate: string): number => {
+    const today = new Date();
+    const hearing = new Date(hearingDate);
+    const difference = (hearing.getTime() - today.getTime()) / (1000 * 3600 * 24);
+    return difference;
+  };
+
+  const getRowClass = (hearingDate: string) => {
+    const diff = getDateDifference(hearingDate);
+    if (diff <= 7 && diff > 3) {
+      return "bg-yellow-200"; // Yellow if within a week
+    } else if (diff <= 3 && diff >= 2) {
+      return "bg-red-200"; // Red if within 3 to 2 days
+    }
+    return ""; // No class if outside these ranges
+  };
+
   if (loading) {
     return <Progress />;
   }
+
 
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6" style={{ zoom: 0.75 }}>
@@ -228,21 +362,21 @@ const ExcelComponent = () => {
                 headers={headers}
                 cases={cases}
                 setFilteredCases={setFilteredCases}
-                setShowModal={setFilterModalOpen}
+                setShowModal={setShowModal}
               />
               <div className="mt-4 flex justify-end gap-2">
-                <Button onClick={() => setFilterModalOpen(false)} className="hover:bg-gray-700 bg-gray-600 text-white px-4 py-2 rounded">
+                <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white text-white px-4 py-2 rounded">
+
                   Close
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          <Button onClick={() => setFilterModalOpen(true)} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
+          <Button onClick={handleOpenFilterModal} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
             Filter
           </Button>
         )}
-
         <Button onClick={scrollToBottom} className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded">
           Scroll to Bottom
         </Button>
@@ -272,6 +406,23 @@ const ExcelComponent = () => {
                 </th>
               ))}
             </tr>
+            <tr>
+        <th>SR. NO</th>
+        <th>DATE OF HEARING</th>
+        <th>CP/SA /SUIT</th>
+        <th>SUBJECT</th>
+        <th>PETITIONER</th>
+        <th>COURT</th>
+        <th>CONCERNED OFFICE</th>
+        <th>COMMENTS FILED (Y/N)</th>
+        <th>LAST HEARING DATE</th>
+        <th>REMARKS</th>
+        {session?.user?.role && (
+
+          <th>ACTIONS</th>
+        )
+        }
+      </tr>
           </thead>
           <tbody>
             {filteredCases.map((row, rowIndex) => (
@@ -286,27 +437,39 @@ const ExcelComponent = () => {
                 <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["COMMENTS FILED (Y/N)"] }}>{row.comments}</td>
                 <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["LAST HEARING DATE"] }}>{row.last_hearing_date}</td>
                 <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["REMARKS"] }}>{row.remarks}</td>
+                { session?.user?.role && (
                 <td className="border border-gray-300 p-2" style={{ width: columnWidths["ACTIONS"] }}>
                   <div className="flex justify-center gap-2">
-                    {editingRow === rowIndex ? (
-                      <>
-                        <Button variant="ghost" size="sm" onClick={handleSave} className="text-green-600 hover:bg-gray-50">
-                          Save
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={handleCancel} className="text-red-600 hover:bg-gray-50">
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button variant="ghost" size="sm" className="text-black hover:text-green-800 hover:bg-gray-50" onClick={() => handleEdit(rowIndex)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-black hover:text-red-600 hover:bg-gray-50" onClick={() => handleDelete(rowIndex)}>
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </>
-                    )}
+                  
+              {editingRow === rowIndex ? (
+                <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => handleSave(rowIndex)}
+                className="text-green-600 hover:bg-gray-50"
+                >
+                  Save
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-black hover:text-green-800 hover:bg-gray-50"
+                    onClick={() => handleEdit(rowIndex)}
+                    >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-black hover:text-red-600 hover:bg-gray-50"
+                    onClick={() => handleDelete(rowIndex)}
+                    >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
                   </div>
                 </td>
                 <td className="border border-gray-300 p-2 text-sm text-black" style={{ width: columnWidths["UPLOAD PDF"] }}>

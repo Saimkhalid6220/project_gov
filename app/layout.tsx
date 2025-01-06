@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import AuthProvider from '@/components/AuthProvider'
 import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "@/components/ui/toaster"
 
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -38,6 +39,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <Toaster />
         </AuthProvider>
       </body>
     </html>

@@ -24,31 +24,27 @@ export default async function Navbar() {
           <span className="rounded-md text-black text-center font-bold py-1 px-2 text-2xl">School Education & Literacy Department 
             Legal Dashboard</span>
         </div>
-
-
         </div>
-       
-
-
         <div className="md:ml-auto flex mt-auto mb-auto mr-4 flex-wrap items-center text-base justify-center">
-          <Link href="/createUser">
-          <button className="inline-flex items-center bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0 mr-2">
-              Create User
-              <svg
-                fill="none"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                className="w-4 h-4 ml-1"
-                viewBox="0 0 24 24"
-              >
-                <path d="M5 12h14M12 5l7 7-7 7" />
-              </svg>
+          {session.user.role && (
+            <>
+          <Link href={"/manageUser"}>
+          <button className="inline-flex items-center bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-sm mt-4 md:mt-0 mr-2">
+              Manage Users
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-settings-2 w-4 h-4 ml-1"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
             </button>
           </Link>
+          <Link href="/createUser">
+            <button className="inline-flex items-center bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-sm mt-4 md:mt-0 mr-2">
+              Create User
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-round-plus w-4 h-4 ml-1"><path d="M2 21a8 8 0 0 1 13.292-6"/><circle cx="10" cy="8" r="5"/><path d="M19 16v6"/><path d="M22 19h-6"/></svg>
+            </button>
+          </Link>
+                  </>
+                )
+              }
           <Link href="./Logout">
-            <button className="inline-flex items-center  bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-base mt-4 md:mt-0">
+            <button className="inline-flex items-center  bg-gray-600 text-white border-0 py-1 px-3 focus:outline-none hover:bg-gray-700 rounded text-sm mt-4 md:mt-0">
               Logout
               <svg
                 fill="none"

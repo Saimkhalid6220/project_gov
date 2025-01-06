@@ -59,7 +59,7 @@ export async function GET() {
 
 export async function PATCH(req) {
   const session = await getServerSession(options);
-  if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
+  if (!session.user.role) return NextResponse.json({ message: "You are not alowed" }, { status: 401 });
 
   try {
     const { sr_no, updateData } = await req.json(); // Extract sr_no and updateData from the request body
@@ -87,7 +87,7 @@ export async function PATCH(req) {
 
 export async function DELETE(req) {
   const session = await getServerSession(options);
-  if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
+  if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });
   try {
     // Extract sr_no from the request body
     const { sr_no } = await req.json();
