@@ -2,26 +2,45 @@
 
 import React, { useState } from "react";
 import axios from "axios";
+import { useToast } from "@/hooks/use-toast";
 
 const UserForm = () => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
+    isAdmin:""
   });
   const [error, setError] = useState("");
+  const { toast } = useToast()
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    toast({
+      title: "Creating User....",
+      description: "Friday, February 10, 2023 at 5:57 PM",
+      variant:"default"
+    })
     try {
       await axios.post("/api/Users", formData);
-      // Show success alert
-      alert("User created successfully!");
-      // Redirect or perform additional actions
     } catch (err) {
+      
       setError("Error creating user");
-    } finally {
-      window.location.href = "/";
+    } 
+    finally {
+      if(!error){
+        toast({
+          title: "User created Sucessfully",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+          variant:"success"
+        })
+      } else {
+        toast({
+          title: "Error creating user",
+          description: "Friday, February 10, 2023 at 5:57 PM",
+          variant:"destructive",
+        })
+      }
     }
   };
 
@@ -35,7 +54,7 @@ const UserForm = () => {
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-screen bg-cover bg-center sm:bg-none md:bg-none lg:bg-cover"
+      className="relative destr flex items-center justify-center min-h-screen bg-cover bg-center sm:bg-none md:bg-none lg:bg-cover"
       style={{
         backgroundImage: "url('/userformlogo.png')",
         backgroundRepeat: "no-repeat",
@@ -78,6 +97,30 @@ const UserForm = () => {
               required
               className="w-full p-2 border rounded text-black focus:outline-none focus:ring focus:ring-green-500 bg-white"
             />
+            <div className="flex space-x-3">
+             <label htmlFor="admin">
+                <input
+                  type="radio"
+                  name="isAdmin"
+                  id="admin"
+                  value="true"
+                  onChange={handleChange}
+                  checked={formData.isAdmin === "true"}
+                />
+                Admin
+              </label>
+              <label htmlFor="user">
+                <input
+                  type="radio"
+                  name="isAdmin"
+                  id="user"
+                  value="false"
+                  onChange={handleChange}
+                  checked={formData.isAdmin === "false"}
+                />
+                User
+              </label>
+            </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <button
               type="submit"
@@ -90,6 +133,7 @@ const UserForm = () => {
       </div>
     </div>
   );
+  
 };
 
 export default UserForm;

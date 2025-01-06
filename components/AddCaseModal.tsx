@@ -1,4 +1,5 @@
 'use client'
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import React, { useState } from "react";
@@ -17,18 +18,39 @@ const AddCaseModal = ({ isOpen, onClose }) => {
     last_hearing_date: "",
     remarks: "",
   });
+
+  const {toast} = useToast()
+
   const [error, setError] = useState("");
   const handleNext = () => setStep((prev) => prev + 1);
   const handlePrevious = () => setStep((prev) => prev - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    toast({
+      title:"creating case...",
+      description:"please wait",
+    })
     try {
       await axios.post("/api/CourtCases", formData);
       console.log("this is form data",formData)
       // Handle success (e.g., redirect or show message)
     } catch (err) {
       setError("Error creating user");
+    } finally {
+      if(!error){
+        toast({
+          title:"Success",
+        description:"Case Created",
+        variant:"success",
+        })
+      } else {
+        toast({
+          title:"failure",
+          description:"Error creating Case",
+          variant:"destructive",
+        })
+      }
     }
     window.location.href="/"
   };
