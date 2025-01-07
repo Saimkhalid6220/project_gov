@@ -35,7 +35,7 @@ export async function GET() {
   try {
     // Define the fields to select
     const fieldsToSelect = {
-      sr_no: 1,
+      _id: 1,
       date_of_hearing: 1,
       cp_sa_suit: 1,
       subject: 1,

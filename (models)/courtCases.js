@@ -5,7 +5,6 @@ mongoose.Promise = global.Promise;
 
 const courtCasesSchema = new Schema(
   {
-    sr_no: Number,
     date_of_hearing: String,
     cp_sa_suit: String,
     subject:String,

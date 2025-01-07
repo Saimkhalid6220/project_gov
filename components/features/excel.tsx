@@ -44,6 +44,8 @@ const ExcelComponent = () => {
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
+  const [pdfId,setpdfId] = useState();
+
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
 
@@ -257,9 +259,8 @@ const ExcelComponent = () => {
   const handleFileUpload = async (file: File, cp_sa_suit: string) => {
     if (!file) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('cp_sa_suit', cp_sa_suit); // Attach unique identifier for the case
+    const data = new FormData();
+    data.append('file', file);
 
     try {
       // Show toast notification during upload
@@ -268,12 +269,15 @@ const ExcelComponent = () => {
         description: `Uploading PDF for case: ${cp_sa_suit}`,
       });
 
-      const response = await fetch('/api/upload', {
+      const response = await fetch('/api/Upload', {
         method: 'POST',
-        body: formData,
+        body: data,
       });
 
       const result = await response.json();
+      
+      setpdfId(result.data)
+
       if (response.ok) {
         // Update the specific case's attachment in state
         const updatedCases = cases.map((c) =>
@@ -301,8 +305,20 @@ const ExcelComponent = () => {
     }
   };
 
+  const handleDownload = async ()=>{
+
+    const response = await fetch(`/api/Get/${pdfId}`);
+    const blob = await response.blob();
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = "DownloadedPdf";
+    link.click()
+  }
+
   // Open PDF preview in a new tab (unchanged)
-  const handleFilePreview = (url: string) => {
+  const handleFilePreview = () => {
+
+    const url = `/api/Get/${pdfId}`;
     window.open(url, '_blank');
   };
 
@@ -366,7 +382,7 @@ const ExcelComponent = () => {
                 setShowModal={setShowModal}
               />
               <div className="mt-4 flex justify-end gap-2">
-                <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white text-white px-4 py-2 rounded">
+                <Button onClick={handleCloseFilterModal} className="hover:bg-gray-700 bg-gray-600 text-white  px-4 py-2 rounded">
                   Close
                 </Button>
               </div>
@@ -407,20 +423,20 @@ const ExcelComponent = () => {
               ))}
             </tr>
             <tr className='bg-gray-100'>
-              <th className='py-3 px-4 text-left font-semibold border-b'>SR. NO</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>DATE OF HEARING</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>CP/SA /SUIT</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>SUBJECT</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>PETITIONER</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>COURT</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>CONCERNED OFFICE</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>COMMENTS FILED (Y/N)</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>LAST HEARING DATE</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>REMARKS</th>
-              <th className='py-3 px-4 text-left font-semibold border-b'>ATTACHMENT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>SR. NO</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>DATE OF HEARING</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>CP/SA /SUIT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>SUBJECT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>PETITIONER</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>COURT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>CONCERNED OFFICE</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>COMMENTS FILED (Y/N)</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>LAST HEARING DATE</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>REMARKS</th>
+              <th className='py-3 px-4 text-left font-semibold border-b text-xs'>ATTACHMENT</th>
               {session?.user?.role && (
 
-                <th className='py-3 px-4 text-left font-semibold border-b'>ACTIONS</th>
+                <th className='py-3 px-4 text-left font-semibold border-b text-xs'>ACTIONS</th>
               )
               }
             </tr>
@@ -462,26 +478,23 @@ const ExcelComponent = () => {
                 {/* PDF Attachment Column */}
                 {/* File Actions Column */}
                 <td className="border border-gray-300 p-2 text-center">
-                  {row.attachment ? (
+                  {/* {row.attachment ? ( */}
                     <div className="flex items-center justify-center gap-2">
                       {/* View File Button */}
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleFilePreview(row.attachment)}
+                        onClick={handleFilePreview}
                       >
                         <FaEye className="h-4 w-4 text-blue-600" title="View File" />
                         {/* Eye icon to preview file */}
                       </Button>
 
                       {/* Download File Button */}
-                      <a href={row.attachment} download className="text-blue-600">
+                      <a onClick={handleDownload} className="text-blue-600">
                         <FaDownload className="h-4 w-4" title="Download File" />
                         {/* Download icon to download file */}
                       </a>
-                    </div>
-                  ) : (
-                    // File Upload Button
                     <label className="cursor-pointer">
                       {/* Hidden file input for uploading PDFs */}
                       <input
@@ -493,12 +506,15 @@ const ExcelComponent = () => {
                         className="hidden" // Hide default file input
                       />
                       <FaUpload
-                        className="h-5 w-5 text-green-600 hover:text-green-800 cursor-pointer"
+                        className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
                         title="Upload File"
                       />
                       {/* Upload icon that triggers the file input */}
                     </label>
-                  )}
+                    </div>
+                  {/* ) : ( */}
+                    {/* // File Upload Button */}
+                  {/* )} */}
                 </td>
                 {/* Actions Column (Edit and Delete) */}
                 {session?.user?.role && (
