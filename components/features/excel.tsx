@@ -1,5 +1,6 @@
 "use client";
 
+import { FaUpload, FaEye, FaDownload, FaEdit, FaTrashAlt } from 'react-icons/fa';
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import Search from "./search";
@@ -12,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 
 const ExcelComponent = () => {
+  // Case Interface Updated to include 'attachment'
   interface Case {
     sr_no: number;
     date_of_hearing: string;
@@ -23,11 +25,13 @@ const ExcelComponent = () => {
     comments: string;
     last_hearing_date: string;
     remarks: string;
+    attachment?: string; // Added attachment field
   }
-  
-  const {toast} = useToast();
 
-  const {data:session} = useSession({required:true})
+
+  const { toast } = useToast();
+
+  const { data: session } = useSession({ required: true })
 
   const [cases, setCases] = useState<Case[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
@@ -44,7 +48,7 @@ const ExcelComponent = () => {
 
 
   const [loading, setLoading] = useState<boolean>(true);
-  const [error,setError] = useState()
+  const [error, setError] = useState()
 
   useEffect(() => {
     const fetchData = async () => {
@@ -115,10 +119,10 @@ const ExcelComponent = () => {
 
   const handleSave = async (rowIndex: number) => {
     // Check if the user is an admin
-      toast({
-        title: "saving in the database",
-        description: "please wait",
-      });
+    toast({
+      title: "saving in the database",
+      description: "please wait",
+    });
     try {
       // Prepare the data to send to the API
       const updatedData = editedData as Case;
@@ -153,18 +157,18 @@ const ExcelComponent = () => {
     } catch (error) {
       setError(error)
       console.error('Error:', error);
-    } finally{
-      if(!error){
+    } finally {
+      if (!error) {
         toast({
           title: "success",
           description: "your data has been updated",
-          variant:"success"
+          variant: "success"
         });
       } else {
         toast({
           title: "Error",
           description: "error updating ,please try again",
-          variant:"destructive"
+          variant: "destructive"
         });
       }
     }
@@ -204,18 +208,18 @@ const ExcelComponent = () => {
     } catch (error) {
       setError(error)
       console.error('Error:', error);
-    } finally{
-      if(!error){
+    } finally {
+      if (!error) {
         toast({
           title: "success",
           description: "your data has been deleted",
-          variant:"success"
+          variant: "success"
         });
       } else {
         toast({
           title: "Error",
           description: "error deleting ,please try again",
-          variant:"destructive"
+          variant: "destructive"
         });
       }
     }
@@ -249,6 +253,58 @@ const ExcelComponent = () => {
     setFilterModalOpen(false);
   };
 
+  // Handle file upload for PDF attachments
+  const handleFileUpload = async (file: File, cp_sa_suit: string) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('cp_sa_suit', cp_sa_suit); // Attach unique identifier for the case
+
+    try {
+      // Show toast notification during upload
+      toast({
+        title: "Uploading file",
+        description: `Uploading PDF for case: ${cp_sa_suit}`,
+      });
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        // Update the specific case's attachment in state
+        const updatedCases = cases.map((c) =>
+          c.cp_sa_suit === cp_sa_suit ? { ...c, attachment: result.fileUrl } : c
+        );
+
+        setCases(updatedCases);
+        setFilteredCases(updatedCases); // Reflect changes in filtered data
+
+        toast({
+          title: "File uploaded successfully",
+          description: `The PDF has been uploaded for case: ${cp_sa_suit}`,
+          variant: "success",
+        });
+      } else {
+        throw new Error(result.message || "Failed to upload the file");
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload Error",
+        description: `Error uploading PDF for case: ${cp_sa_suit}`,
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Open PDF preview in a new tab (unchanged)
+  const handleFilePreview = (url: string) => {
+    window.open(url, '_blank');
+  };
 
 
   if (loading) {
@@ -334,7 +390,7 @@ const ExcelComponent = () => {
       </div>
 
       <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
-      <table ref={tableRef} className="w-full border-collapse table-fixed">
+        <table ref={tableRef} className="w-full border-collapse table-fixed">
           <thead>
             <tr className={styles.hidden}>
               {headers.map((header, index) => (
@@ -344,101 +400,150 @@ const ExcelComponent = () => {
                   style={{
                     wordWrap: "break-word", // Allow wrapping within words
                     whiteSpace: "normal",  // Enable multi-line text
-            }}
-          >
-            {header}
-          </th>
-        ))}
-      </tr>
-      <tr>
-        <th>SR. NO</th>
-        <th>DATE OF HEARING</th>
-        <th>CP/SA /SUIT</th>
-        <th>SUBJECT</th>
-        <th>PETITIONER</th>
-        <th>COURT</th>
-        <th>CONCERNED OFFICE</th>
-        <th>COMMENTS FILED (Y/N)</th>
-        <th>LAST HEARING DATE</th>
-        <th>REMARKS</th>
-        {session?.user?.role && (
-
-          <th>ACTIONS</th>
-        )
-        }
-      </tr>
-    </thead>
-    <tbody>
-      {filteredCases.map((row, rowIndex) => (
-        <tr
-        key={rowIndex}
-        className={`${getRowClass(row.date_of_hearing)} ${editingRow === rowIndex ? "bg-white text-black" : ""
-          }`}
-      >
-          {headers.map((header, cellIndex) => (
-            <td
-              key={cellIndex}
-              className="border border-gray-300 p-2 text-sm text-black"
-            >
-              {editingRow === rowIndex ? (
-                <input
-                  type="text"
-                  value={editedData[header] || row[header] || ""}
-                  onChange={(e) => {
-                    const newData = { ...editedData };
-                    newData[header] = e.target.value;
-                    setEditedData(newData);
                   }}
-                  className="w-full p-1 border rounded bg-white text-black"
-                />
-              ) : (
-                row[header] || "-" // Add a hyphen if the cell value is empty or null
-              )}
-            </td>
-          ))}
-          { session?.user?.role && (
-
-            
-            <td className="border border-gray-300 p-2">
-            <div className="flex justify-center gap-2">
-              {editingRow === rowIndex ? (
-                <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => handleSave(rowIndex)}
-                className="text-green-600 hover:bg-gray-50"
                 >
-                  Save
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-black hover:text-green-800 hover:bg-gray-50"
-                    onClick={() => handleEdit(rowIndex)}
-                    >
-                    <Edit className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-black hover:text-red-600 hover:bg-gray-50"
-                    onClick={() => handleDelete(rowIndex)}
-                    >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </>
-              )}
-            </div>
-          </td>
-            )
-            }
-        </tr>
-      ))}
-    </tbody>
-  </table>
-</div>
+                  {header}
+                </th>
+              ))}
+            </tr>
+            <tr className='bg-gray-100'>
+              <th className='py-3 px-4 text-left font-semibold border-b'>SR. NO</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>DATE OF HEARING</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>CP/SA /SUIT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>SUBJECT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>PETITIONER</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>COURT</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>CONCERNED OFFICE</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>COMMENTS FILED (Y/N)</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>LAST HEARING DATE</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>REMARKS</th>
+              <th className='py-3 px-4 text-left font-semibold border-b'>ATTACHMENT</th>
+              {session?.user?.role && (
+
+                <th className='py-3 px-4 text-left font-semibold border-b'>ACTIONS</th>
+              )
+              }
+            </tr>
+          </thead>
+          <tbody>
+            {filteredCases.map((row, rowIndex) => (
+              <tr
+                key={rowIndex}
+                className={`${getRowClass(row.date_of_hearing)} ${editingRow === rowIndex ? "bg-white text-black" : ""
+                  }`}
+              >
+                {/* Dynamically generate SR. NO based on rowIndex */}
+                <td className="border border-gray-300 p-2 text-sm text-black">
+                  {rowIndex + 1}
+                </td>
+                {headers.map((header, cellIndex) => (
+                  <td
+                    key={cellIndex}
+                    className="border border-gray-300 p-2 text-sm text-black"
+                  >
+                    {editingRow === rowIndex ? (
+                      <input
+                        type="text"
+                        value={editedData[header] || row[header] || ""}
+                        onChange={(e) => {
+                          const newData = { ...editedData };
+                          newData[header] = e.target.value;
+                          setEditedData(newData);
+                        }}
+                        className="w-full p-1 border rounded bg-white text-black"
+                      />
+                    ) : (
+                      row[header] || "-" // Add a hyphen if the cell value is empty or null
+                    )}
+                  </td>
+                ))}
+
+
+                {/* PDF Attachment Column */}
+                {/* File Actions Column */}
+                <td className="border border-gray-300 p-2 text-center">
+                  {row.attachment ? (
+                    <div className="flex items-center justify-center gap-2">
+                      {/* View File Button */}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleFilePreview(row.attachment)}
+                      >
+                        <FaEye className="h-4 w-4 text-blue-600" title="View File" />
+                        {/* Eye icon to preview file */}
+                      </Button>
+
+                      {/* Download File Button */}
+                      <a href={row.attachment} download className="text-blue-600">
+                        <FaDownload className="h-4 w-4" title="Download File" />
+                        {/* Download icon to download file */}
+                      </a>
+                    </div>
+                  ) : (
+                    // File Upload Button
+                    <label className="cursor-pointer">
+                      {/* Hidden file input for uploading PDFs */}
+                      <input
+                        type="file"
+                        accept="application/pdf"
+                        onChange={(e) =>
+                          e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)
+                        }
+                        className="hidden" // Hide default file input
+                      />
+                      <FaUpload
+                        className="h-5 w-5 text-green-600 hover:text-green-800 cursor-pointer"
+                        title="Upload File"
+                      />
+                      {/* Upload icon that triggers the file input */}
+                    </label>
+                  )}
+                </td>
+                {/* Actions Column (Edit and Delete) */}
+                {session?.user?.role && (
+
+
+                  <td className="border border-gray-300 p-2">
+                    <div className="flex justify-center gap-2">
+                      {editingRow === rowIndex ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSave(rowIndex)}
+                          className="text-green-600 hover:bg-gray-50"
+                        >
+                          Save
+                        </Button>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-black hover:text-green-800 hover:bg-gray-50"
+                            onClick={() => handleEdit(rowIndex)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-black hover:text-red-600 hover:bg-gray-50"
+                            onClick={() => handleDelete(rowIndex)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                )
+                }
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
 
   );

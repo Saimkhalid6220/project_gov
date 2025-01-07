@@ -1,0 +1,236 @@
+ED.Steda Karachi
+CPM.RSU
+DG.PDR
+Dir.DCAR
+Chairman.STBB
+PC.ILMI
+Chief.AdvisorCW
+Add.DirTTI
+DG.HRT
+DirAudit.SELD
+Dir.NFE
+DG.PvtSchools
+DirPrimary.khi
+Dirsecondary.khi
+DirPrimary.Hyd
+DirSecondary.hyd
+DirPrimary.Sukkur
+DirSecondary.Sukkur
+DirPrimary.Lrk
+DirSecondary.Lrk
+DirPrimary.Sba
+DirSecondary.Sba
+DirPrimary.Mpk
+DirSecondary.Mpk
+admin
+ED.Steda Karachi	ED.StedaKarachi@seld.gov.pk	ED.StedaKarachi@446	User
+CPM.RSU	CPM.RSU@seld.gov.pk	CPM.RSU@446	User
+DG.PDR	DG.PDR@seld.gov.pk	DG.PDR@446	User
+Dir.DCAR	Dir.DCAR@seld.gov.pk	Dir.DCAR@446	User
+Chairman.STBB	Chairman.STBB@seld.gov.pk	Chairman.STBB@446	User
+PC.ILMI	PC.ILMI@seld.gov.pk	PC.ILMI@446	User
+Chief.AdvisorCW	Chief.AdvisorCW@seld.gov.pk	Chief.AdvisorCW@446	User
+Add.DirTTI	Add.DirTTI@seld.gov.pk	Add.DirTTI@446	User
+DG.HRT	DG.HRT@seld.gov.pk	DG.HRT@446	User
+DirAudit.SELD	DirAudit.SELD@seld.gov.pk	DirAudit.SELD@446	User
+Dir.NFE	Dir.NFE@seld.gov.pk	Dir.NFE@446	User
+DG.PvtSchools	DG.PvtSchools@seld.gov.pk	DG.PvtSchools@446	User
+DirPrimary.khi	DirPrimary.khi@seld.gov.pk	DirPrimary.khi@446	User
+Dirsecondary.khi	Dirsecondary.khi@seld.gov.pk	Dirsecondary.khi@446	User
+DirPrimary.Hyd	DirPrimary.Hyd@seld.gov.pk	DirPrimary.Hyd@446	User
+DirSecondary.hyd	DirSecondary.hyd@seld.gov.pk	DirSecondary.hyd@446	User
+DirPrimary.Sukkur	DirPrimary.Sukkur@seld.gov.pk	DirPrimary.Sukkur@446	User
+DirSecondary.Sukkur	DirSecondary.Sukkur@seld.gov.pk	DirSecondary.Sukkur@446	User
+DirPrimary.Lrk	DirPrimary.Lrk@seld.gov.pk	DirPrimary.Lrk@446	User
+DirSecondary.Lrk	DirSecondary.Lrk@seld.gov.pk	DirSecondary.Lrk@446	User
+DirPrimary.Sba	DirPrimary.Sba@seld.gov.pk	DirPrimary.Sba@446	User
+DirSecondary.Sba	DirSecondary.Sba@seld.gov.pk	DirSecondary.Sba@446	User
+DirPrimary.Mpk	DirPrimary.Mpk@seld.gov.pk	DirPrimary.Mpk@446	User
+DirSecondary.Mpk	DirSecondary.Mpk@seld.gov.pk	DirSecondary.Mpk@446	User
+admin
+
+
+
+[
+    {
+        "name":"LegalWing.Seld",
+        "email":"LegalWing.Seld@seld.gov.pk",
+        "password":"LegalWing.Seld@446",
+        "isAdmin": true
+    },
+    {
+        "name": "ED.Steda Karachi",
+        "email": "ED.StedaKarachi@seld.gov.pk",
+        "password": "ED.StedaKarachi@446",
+        "isAdmin": false
+    },
+    {
+        "name": "CPM.RSU",
+        "email": "CPM.RSU@seld.gov.pk",
+        "password": "CPM.RSU@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DG.PDR",
+        "email": "DG.PDR@seld.gov.pk",
+        "password": "DG.PDR@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Dir.DCAR",
+        "email": "Dir.DCAR@seld.gov.pk",
+        "password": "Dir.DCAR@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Chairman.STBB",
+        "email": "Chairman.STBB@seld.gov.pk",
+        "password": "Chairman.STBB@446",
+        "isAdmin": false
+    },
+    {
+        "name": "PC.ILMI",
+        "email": "PC.ILMI@seld.gov.pk",
+        "password": "PC.ILMI@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Chief.AdvisorCW",
+        "email": "Chief.AdvisorCW@seld.gov.pk",
+        "password": "Chief.AdvisorCW@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Add.DirTTI",
+        "email": "Add.DirTTI@seld.gov.pk",
+        "password": "Add.DirTTI@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DG.HRT",
+        "email": "DG.HRT@seld.gov.pk",
+        "password": "DG.HRT@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirAudit.SELD",
+        "email": "DirAudit.SELD@seld.gov.pk",
+        "password": "DirAudit.SELD@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Dir.NFE",
+        "email": "Dir.NFE@seld.gov.pk",
+        "password": "Dir.NFE@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DG.PvtSchools",
+        "email": "DG.PvtSchools@seld.gov.pk",
+        "password": "DG.PvtSchools@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.khi",
+        "email": "DirPrimary.khi@seld.gov.pk",
+        "password": "DirPrimary.khi@446",
+        "isAdmin": false
+    },
+    {
+        "name": "Dirsecondary.khi",
+        "email": "Dirsecondary.khi@seld.gov.pk",
+        "password": "Dirsecondary.khi@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.Hyd",
+        "email": "DirPrimary.Hyd@seld.gov.pk",
+        "password": "DirPrimary.Hyd@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirSecondary.hyd",
+        "email": "DirSecondary.hyd@seld.gov.pk",
+        "password": "DirSecondary.hyd@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.Sukkur",
+        "email": "DirPrimary.Sukkur@seld.gov.pk",
+        "password": "DirPrimary.Sukkur@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirSecondary.Sukkur",
+        "email": "DirSecondary.Sukkur@seld.gov.pk",
+        "password": "DirSecondary.Sukkur@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.Lrk",
+        "email": "DirPrimary.Lrk@seld.gov.pk",
+        "password": "DirPrimary.Lrk@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirSecondary.Lrk",
+        "email": "DirSecondary.Lrk@seld.gov.pk",
+        "password": "DirSecondary.Lrk@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.Sba",
+        "email": "DirPrimary.Sba@seld.gov.pk",
+        "password": "DirPrimary.Sba@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirSecondary.Sba",
+        "email": "DirSecondary.Sba@seld.gov.pk",
+        "password": "DirSecondary.Sba@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirPrimary.Mpk",
+        "email": "DirPrimary.Mpk@seld.gov.pk",
+        "password": "DirPrimary.Mpk@446",
+        "isAdmin": false
+    },
+    {
+        "name": "DirSecondary.Mpk",
+        "email": "DirSecondary.Mpk@seld.gov.pk",
+        "password": "DirSecondary.Mpk@446",
+        "isAdmin": false
+    }
+]
+
+
+
+
+ED.Steda Karachi
+CPM.RSU
+DG.PDR
+Dir.DCAR
+Chairman.STBB
+PC.ILMI
+Chief.AdvisorCW
+Add.DirTTI
+DG.HRT
+DirAudit.SELD
+Dir.NFE
+DG.PvtSchools
+DirPrimary.khi
+Dirsecondary.khi
+DirPrimary.Hyd
+DirSecondary.hyd
+DirPrimary.Sukkur
+DirSecondary.Sukkur
+DirPrimary.Lrk
+DirSecondary.Lrk
+DirPrimary.Sba
+DirSecondary.Sba
+DirPrimary.Mpk
+DirSecondary.Mpk
+
+
+
