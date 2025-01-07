@@ -7,7 +7,6 @@ import React, { useState } from "react";
 const AddCaseModal = ({ isOpen, onClose }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    sr_no: "",
     date_of_hearing: "",
     cp_sa_suit: "",
     subject: "",
@@ -67,7 +66,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div className="relative bg-gray-50 rounded-lg p-8 w-full max-w-xl shadow-xl">
+  <div className="relative  bg-gray-50 rounded-lg p-8 w-full max-w-xl shadow-xl">
     <button
       className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
       onClick={onClose}
@@ -82,17 +81,6 @@ const AddCaseModal = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit}>
           {step === 1 && (
             <div className="space-y-4">
-              <div>
-                <label className="block text-gray-600 mb-1">Sr No:</label>
-                <input
-                  type="number"
-                  name="sr_no"
-                  value={formData.sr_no}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-gray-600 mb-1">Date of Hearing:</label>
                 <input

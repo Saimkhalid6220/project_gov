@@ -11,6 +11,7 @@ import Progress from "@/components/features/loader"
 import Filter from "./filter";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
+import { FaSpinner } from "react-icons/fa"; // Import a spinner icon
 
 const ExcelComponent = () => {
   // Case Interface Updated to include 'attachment'
@@ -44,7 +45,7 @@ const ExcelComponent = () => {
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
-  const [pdfId,setpdfId] = useState();
+  const [pdfId, setpdfId] = useState();
 
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
 
@@ -275,7 +276,7 @@ const ExcelComponent = () => {
       });
 
       const result = await response.json();
-      
+
       setpdfId(result.data)
 
       if (response.ok) {
@@ -305,15 +306,32 @@ const ExcelComponent = () => {
     }
   };
 
-  const handleDownload = async ()=>{
+  const [downloading, setDownloading] = useState(false); // Add downloading state
 
-    const response = await fetch(`/api/Get/${pdfId}`);
-    const blob = await response.blob();
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = "DownloadedPdf";
-    link.click()
-  }
+  const handleDownload = async () => {
+    setDownloading(true); // Show loader
+    try {
+      const response = await fetch(`/api/Get/${pdfId}`);
+      if (!response.ok) {
+        throw new Error("Failed to download PDF");
+      }
+
+      const blob = await response.blob();
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = "DownloadedPdf";
+      link.click();
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      toast({
+        title: "Download Error",
+        description: "Unable to download the PDF. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setDownloading(false); // Hide loader
+    }
+  };
 
   // Open PDF preview in a new tab (unchanged)
   const handleFilePreview = () => {
@@ -478,44 +496,34 @@ const ExcelComponent = () => {
                 {/* PDF Attachment Column */}
                 {/* File Actions Column */}
                 <td className="border border-gray-300 p-2 text-center">
-                  {/* {row.attachment ? ( */}
-                    <div className="flex items-center justify-center gap-2">
-                      {/* View File Button */}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleFilePreview}
-                      >
-                        <FaEye className="h-4 w-4 text-blue-600" title="View File" />
-                        {/* Eye icon to preview file */}
-                      </Button>
-
-                      {/* Download File Button */}
-                      <a onClick={handleDownload} className="text-blue-600">
-                        <FaDownload className="h-4 w-4" title="Download File" />
-                        {/* Download icon to download file */}
-                      </a>
-                    <label className="cursor-pointer">
-                      {/* Hidden file input for uploading PDFs */}
-                      <input
-                        type="file"
-                        accept="application/pdf"
-                        onChange={(e) =>
-                          e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)
-                        }
-                        className="hidden" // Hide default file input
-                      />
-                      <FaUpload
-                        className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
-                        title="Upload File"
-                      />
-                      {/* Upload icon that triggers the file input */}
-                    </label>
+                  {downloading ? (
+                    <div className="flex justify-center items-center">
+                      <FaSpinner className="h-6 w-6 text-blue-600 animate-spin" />
                     </div>
-                  {/* ) : ( */}
-                    {/* // File Upload Button */}
-                  {/* )} */}
+                  ) : (
+                    <div className="flex items-center justify-center gap-2">
+                      <a onClick={handleFilePreview} className="cursor-pointer text-blue-600 hover:text-blue-800">
+                        <FaEye className="h-4 w-4" title="View File" />
+                      </a>
+                      <a onClick={handleDownload} className="text-blue-600 hover:text-blue-800">
+                        <FaDownload className="h-4 w-4" title="Download File" />
+                      </a>
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
+                          className="hidden"
+                        />
+                        <FaUpload
+                          className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
+                          title="Upload File"
+                        />
+                      </label>
+                    </div>
+                  )}
                 </td>
+
                 {/* Actions Column (Edit and Delete) */}
                 {session?.user?.role && (
 
@@ -527,7 +535,7 @@ const ExcelComponent = () => {
                           variant="ghost"
                           size="sm"
                           onClick={() => handleSave(rowIndex)}
-                          className="text-green-600 hover:bg-gray-50"
+                          className="text-green-600 hover:text-green-800"
                         >
                           Save
                         </Button>
@@ -557,9 +565,21 @@ const ExcelComponent = () => {
                 }
               </tr>
             ))}
+
           </tbody>
+
+
+
         </table>
+
+
+
       </div>
+
+      <Button onClick={scrollToTop} className="bg-gray-600 pt-2 pb-2 gap-x-2 gap-y-2 hover:bg-gray-700 text-white px-4 py-2 rounded">
+        Scroll to Top
+      </Button>
+
     </div>
 
   );
