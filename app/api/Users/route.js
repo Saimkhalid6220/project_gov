@@ -20,22 +20,23 @@ export async function POST(req) {
     }
 
     // check for duplicate emails
+    
     const duplicate = await User.findOne({ email: userData.email })
-      .lean()
-      .exec();
-
+    .lean()
+    .exec();
+    
     if (duplicate) {
       return NextResponse.json({ message: "Duplicate Email" }, { status: 409 });
     }
-
-    const hashPassword = await bcrypt.hash(userData.password, 10);
-    userData.password = hashPassword;
-
-    await User.create(userData);
     
-    return NextResponse.json({ message: "User Created." }, { status: 201 });
+      const hashPassword = await bcrypt.hash(userData.password, 10);
+      userData.password = hashPassword;
+      
+      await User.create(userData);
+      
+      return NextResponse.json({ message: "User Created." }, { status: 201 });
   } catch (error) {
-    console.log(err);
+    console.log(error);
     return NextResponse.json({ message: "Error", error }, { status: 500 });
   }
 }
