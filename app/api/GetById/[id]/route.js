@@ -4,10 +4,16 @@ import Pdf from '@/(models)/pdf';
 
 export async function GET(req, { params }) {
     const { id } = await params; // Extract the PDF ID from the route params
-    console.log(id);
+    const decodedId = decodeURIComponent(id);
+
+    if  (!decodedId) {
+      return NextResponse.json({ message: "PDF ID is required" }, { status: 400 });
+    }
+    console.log(decodedId);
+
   
     try {
-      const pdf = await Pdf.findById(id);
+      const pdf = await Pdf.findOne({cp_sa_suit:decodedId})
   
       if (!pdf) {
         return NextResponse.json({ message: "PDF not found" }, { status: 404 });

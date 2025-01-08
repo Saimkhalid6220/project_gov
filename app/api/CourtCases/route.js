@@ -62,15 +62,17 @@ export async function PATCH(req) {
   if (!session.user.role) return NextResponse.json({ message: "You are not alowed" }, { status: 401 });
 
   try {
-    const { sr_no, updateData } = await req.json(); // Extract sr_no and updateData from the request body
+    const  updatedData  = await req.json(); // Extract sr_no and updateData from the request body
 
-    if (!sr_no || !updateData) {
+    if (!updatedData) {
       return NextResponse.json({ message: "sr_no and updateData are required" }, { status: 400 });
     }
 
+    const cp_sa_suit = updatedData.cp_sa_suit;
+
     const updatedCase = await CourtCases.findOneAndUpdate(
-      { sr_no }, // Filter by sr_no
-      { $set: updateData }, // Fields to update
+      { cp_sa_suit }, // Filter by cp_sa_suit
+      { $set: updatedData }, // Fields to update
       { new: true, runValidators: true } // Return the updated document and validate inputs
     );
 
@@ -90,14 +92,14 @@ export async function DELETE(req) {
   if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });
   try {
     // Extract sr_no from the request body
-    const { sr_no } = await req.json();
+    const { cp_sa_suit } = await req.json();
 
-    if (!sr_no) {
+    if (!cp_sa_suit) {
       return NextResponse.json({ message: "sr_no is required" }, { status: 400 });
     }
 
     // Find and delete the case by sr_no
-    const deletedCase = await CourtCases.findOneAndDelete({ sr_no });
+    const deletedCase = await CourtCases.findOneAndDelete({ cp_sa_suit });
 
     if (!deletedCase) {
       return NextResponse.json({ message: "Case with given sr_no not found" }, { status: 404 });

@@ -6,6 +6,7 @@ export async function POST(req){
 
     const data = await req.formData();
     const file = data.get("file");
+    const cp_sa_suit = data.get("cp_sa_suit");
 
     if(!file) return NextResponse.json({message: "File is required"}, {status: 400})
 
@@ -17,6 +18,7 @@ export async function POST(req){
         
         const newPDF = new Pdf({
             name:file.name,
+            cp_sa_suit:cp_sa_suit,
             data:bufferData,
             contentType:file.type
         })

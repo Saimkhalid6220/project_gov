@@ -45,9 +45,9 @@ const ExcelComponent = () => {
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
-  const [pdfId, setpdfId] = useState();
-
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
+  const[uploadedPdf,setUploadedPdf] = useState<string[]>([""]);
+  const [getPdf,setGetPdf] = useState(false)
 
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -61,7 +61,6 @@ const ExcelComponent = () => {
         const json = await response.json();
         if (json && Array.isArray(json)) {
           setData(json);
-          console.log("Data fetched: ", json); // Log data here
 
           // Filter out the '_id' property
           const filteredHeaders = Object.keys(json[0]).filter(header => header !== '_id');
@@ -82,6 +81,19 @@ const ExcelComponent = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+   const getUploadedPdf = async () =>{
+    const response = await fetch('/api/Get');
+    const data = await response.json();
+
+    setUploadedPdf(data)
+
+    console.log(data)
+   }
+
+   getUploadedPdf();
+  }, [getPdf])
 
   const handleSaveChanges = () => {
     localStorage.setItem('tableData', JSON.stringify(cases));
@@ -129,7 +141,7 @@ const ExcelComponent = () => {
     try {
       // Prepare the data to send to the API
       const updatedData = editedData as Case;
-      const updatedCase = { sr_no: cases[rowIndex].sr_no, updateData: updatedData };
+      // const updatedCase = { sr_no: cases[rowIndex].sr_no, updateData: updatedData };
 
       // Send the update request to the API
       const response = await fetch('/api/CourtCases', {
@@ -137,7 +149,7 @@ const ExcelComponent = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(updatedCase),
+        body: JSON.stringify(updatedData),
       });
 
       const data = await response.json();
@@ -185,7 +197,7 @@ const ExcelComponent = () => {
     })
 
     try {
-      const sr_no = cases[rowIndex].sr_no;
+      const cp_sa_suit = cases[rowIndex].cp_sa_suit;
 
       // Send the DELETE request to the API
       const response = await fetch('/api/CourtCases', {
@@ -193,7 +205,7 @@ const ExcelComponent = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ sr_no }),
+        body: JSON.stringify({ cp_sa_suit }),
       });
 
       const data = await response.json();
@@ -262,6 +274,7 @@ const ExcelComponent = () => {
 
     const data = new FormData();
     data.append('file', file);
+    data.append('cp_sa_suit', cp_sa_suit);
 
     try {
       // Show toast notification during upload
@@ -277,13 +290,13 @@ const ExcelComponent = () => {
 
       const result = await response.json();
 
-      setpdfId(result.data)
-
       if (response.ok) {
         // Update the specific case's attachment in state
         const updatedCases = cases.map((c) =>
           c.cp_sa_suit === cp_sa_suit ? { ...c, attachment: result.fileUrl } : c
         );
+
+        setGetPdf(true)
 
         setCases(updatedCases);
         setFilteredCases(updatedCases); // Reflect changes in filtered data
@@ -308,10 +321,13 @@ const ExcelComponent = () => {
 
   const [downloading, setDownloading] = useState(false); // Add downloading state
 
-  const handleDownload = async () => {
+  const handleDownload = async (pdfId:string) => {
     setDownloading(true); // Show loader
+
+    const encodedPdfId = encodeURIComponent(pdfId); // Encode special characters
+
     try {
-      const response = await fetch(`/api/Get/${pdfId}`);
+      const response = await fetch(`/api/GetById/${encodedPdfId}`);
       if (!response.ok) {
         throw new Error("Failed to download PDF");
       }
@@ -334,9 +350,11 @@ const ExcelComponent = () => {
   };
 
   // Open PDF preview in a new tab (unchanged)
-  const handleFilePreview = () => {
+  const handleFilePreview = (pdfId:string) => {
 
-    const url = `/api/Get/${pdfId}`;
+    const encodedPdfId = encodeURIComponent(pdfId); // Encode special characters
+
+    const url = `/api/GetById/${encodedPdfId}`;
     window.open(url, '_blank');
   };
 
@@ -502,12 +520,17 @@ const ExcelComponent = () => {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">
-                      <a onClick={handleFilePreview} className="cursor-pointer text-blue-600 hover:text-blue-800">
+                    {uploadedPdf.find((pdfId)=>pdfId==row.cp_sa_suit) ? (
+                      <>
+                      <a onClick={()=>handleFilePreview(row.cp_sa_suit)} className="cursor-pointer text-blue-600 hover:text-blue-800">
                         <FaEye className="h-4 w-4" title="View File" />
                       </a>
-                      <a onClick={handleDownload} className="text-blue-600 hover:text-blue-800">
+                      <a onClick={()=>handleDownload(row.cp_sa_suit)} className="text-blue-600 hover:text-blue-800">
                         <FaDownload className="h-4 w-4" title="Download File" />
                       </a>
+                      </>
+                      ) : (
+
                       <label className="cursor-pointer">
                         <input
                           type="file"
@@ -515,11 +538,14 @@ const ExcelComponent = () => {
                           onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
                           className="hidden"
                         />
-                        <FaUpload
+                          <FaUpload
                           className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
                           title="Upload File"
-                        />
+                          />
                       </label>
+                      )
+                    
+                    }
                     </div>
                   )}
                 </td>

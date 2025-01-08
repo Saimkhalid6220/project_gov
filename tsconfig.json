@@ -35,7 +35,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts"
-, "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/options.js", "app/api/Users/route.js", "components/AuthProviders.js", "components/UserForm.tsx", "node_modules/@alloc/signout.tsx", "components/features/excel.jsx"  ],
+, "app/api/auth/[...nextauth]/route.js", "app/api/auth/[...nextauth]/options.js", "app/api/Users/route.js", "components/AuthProviders.js", "components/UserForm.tsx", "node_modules/@alloc/signout.tsx", "components/features/excel.jsx", "app/api/Get/route.js"  ],
   "exclude": [
     "node_modules"
   ]
