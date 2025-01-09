@@ -126,8 +126,13 @@ const ExcelComponent = () => {
     return false;
   }).length;
 
-  const closedCases = totalCases - activeCases;
-
+  const closedCases = cases.filter(row => {
+    if (remarksIndex !== null) {
+      const value = row[headers[remarksIndex]]?.toString().toLowerCase().trim() || '';
+      return value === 'dismissed' || value === 'disposed off with direction' || value === 'disposed'|| value === 'disposed off' || value === "disposed of with directions" || value === 'disposed of';
+    }
+    return false;
+  }).length;
   
 
  // Find the index of the "comments" column dynamically
@@ -395,7 +400,7 @@ const CasesYesFiled = totalCases - CasesNotFiled;
     const difference = (hearing.getTime() - today.getTime()) / (1000 * 3600 * 24);
     return difference;
   };
-
+  
   const getRowClass = (hearingDate: string) => {
     const diff = getDateDifference(hearingDate);
     if (diff <= 7 && diff > 3) {
