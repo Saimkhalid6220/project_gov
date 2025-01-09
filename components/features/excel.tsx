@@ -320,7 +320,7 @@ const CasesYesFiled = totalCases - CasesNotFiled;
           c.cp_sa_suit === cp_sa_suit ? { ...c, attachment: result.fileUrl } : c
         );
 
-        setGetPdf(true)
+        setGetPdf((prevState)=>(prevState === false ? true : false))
 
         setCases(updatedCases);
         setFilteredCases(updatedCases); // Reflect changes in filtered data
@@ -373,6 +373,40 @@ const CasesYesFiled = totalCases - CasesNotFiled;
     }
   };
 
+  const handleDeletepdf = async (id:string) => {
+
+    const encodedPdfId = encodeURIComponent(id);
+    toast({
+      title:'deleting',
+      description:'please wait',
+    })
+
+    try {
+      const response = await fetch(`/api/Delete/${encodedPdfId}`,
+        {
+          method: 'DELETE'
+        }
+      )
+      if (!response.ok) {
+        toast({
+          title:'failure',
+          description:'unable to delete',
+          variant:'destructive'
+        })
+        throw new Error("Failed to delete PDF");
+      } else{
+        setGetPdf((prevState)=>(prevState === false ? true : false))
+        toast({
+          title:'success',
+          description:'deleted successfully',
+          variant:'success'
+        })
+        }
+      } catch(e){
+        console.error(error)
+      } finally {
+      }
+  }
   // Open PDF preview in a new tab (unchanged)
   const handleFilePreview = (pdfId:string) => {
 
@@ -556,21 +590,25 @@ const CasesYesFiled = totalCases - CasesNotFiled;
                       <a onClick={()=>handleDownload(row.cp_sa_suit)} className="text-blue-600 hover:text-blue-800">
                         <FaDownload className="h-4 w-4" title="Download File" />
                       </a>
+                         <a onClick={()=>handleDeletepdf(row.cp_sa_suit)} className="text-red-600 hover:text-red-800">
+                        <FaTrashAlt className="h-4 w-4" title="Download File" />
+                      </a>
                       </>
                       ) : (
-
+                        <>
                       <label className="cursor-pointer">
                         <input
                           type="file"
                           accept="application/pdf"
                           onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
                           className="hidden"
-                        />
+                          />
                           <FaUpload
                           className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
                           title="Upload File"
                           />
                       </label>
+                          </>
                       )
                     
                     }
