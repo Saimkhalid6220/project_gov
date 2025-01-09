@@ -5,19 +5,19 @@ import { options } from "../auth/[...nextauth]/options";
 
 
 export async function POST(req) {
-  // const session = await getServerSession(options);
-  // if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
+  const session = await getServerSession(options);
+  if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
 
   try {
     const courtCaseData = await req.json();
 
     // Confirm data exists
-    // if (!courtCaseData) {
-    //   return NextResponse.json(
-    //     { message: "All fields are required." },
-    //     { status: 400 }
-    //   );
-    // }
+    if (!courtCaseData) {
+      return NextResponse.json(
+        { message: "All fields are required." },
+        { status: 400 }
+      );
+    }
 
     await CourtCases.create(courtCaseData);
     console.log("Court Case Created.");
