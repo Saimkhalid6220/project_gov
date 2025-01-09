@@ -43,6 +43,7 @@ const ExcelComponent = () => {
   const [editedData, setEditedData] = useState<Partial<Case>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
+  const [commentsIndex, setCommentsIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
@@ -126,6 +127,29 @@ const ExcelComponent = () => {
   }).length;
 
   const closedCases = totalCases - activeCases;
+
+  
+
+ // Find the index of the "comments" column dynamically
+useEffect(() => {
+  const commentsIdx = headers.findIndex(
+    (header) => header.toLowerCase() === 'comments'
+  );
+  setCommentsIndex(commentsIdx);
+}, [headers]);
+
+// Calculate CasesNotFiled
+const CasesNotFiled = cases.filter((row) => {
+  if (commentsIndex !== null && headers[commentsIndex]) {
+    const value = row[headers[commentsIndex]]?.toString().toLowerCase().trim() || '';
+    return value === 'no' || value === 'No'; // Check if value is 'no' or empty
+  }
+  return false;
+}).length;
+
+// Calculate CasesYesFiled
+const CasesYesFiled = totalCases - CasesNotFiled;
+
 
   const handleEdit = (rowIndex: number) => {
     setEditingRow(rowIndex);
@@ -390,18 +414,22 @@ const ExcelComponent = () => {
   return (
     <div ref={topRef} className="min-h-screen bg-white text-black p-6">
 
-      <div className="grid grid-cols-3 gap-4 mb-6">
-        <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
+      <div className=" w-full grid-cols-3 flex gap-4 mb-6">
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
           <h3 className="text-sm font-medium text-black">Total Cases</h3>
           <p className="text-2xl font-semibold mt-2 text-blue-700">{totalCases}</p>
         </div>
-        <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
           <h3 className="text-sm font-medium text-black">Active Cases</h3>
           <p className="text-2xl font-semibold mt-2 text-green-600">{activeCases}</p>
         </div>
-        <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
           <h3 className="text-sm font-medium text-black">Closed Cases</h3>
           <p className="text-2xl font-semibold mt-2 text-red-600">{closedCases}</p>
+        </div>
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+          <h3 className="text-sm font-medium text-black">Comments Not Filed Cases</h3>
+          <p className="text-2xl font-semibold mt-2 text-red-600">{CasesNotFiled}</p>
         </div>
       </div>
 

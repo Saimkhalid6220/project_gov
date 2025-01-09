@@ -5,20 +5,24 @@ const Progress = () => {
     
       <div className="min-h-screen bg-white text-black p-6">
         {/* Cards Section */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
-            <h3 className="text-sm font-medium text-black">Total Cases</h3>
-            <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
-          </div>
-          <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
-            <h3 className="text-sm font-medium text-black">Active Cases</h3>
-            <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
-          </div>
-          <div className="p-4 rounded-lg bg-white border border-gray-400 shadow-sm">
-            <h3 className="text-sm font-medium text-black">Closed Cases</h3>
-            <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
-          </div>
+        <div className=" w-full grid-cols-3 flex gap-4 mb-6">
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+          <h3 className="text-sm font-medium text-black">Total Cases</h3>
+          <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
         </div>
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+          <h3 className="text-sm font-medium text-black">Active Cases</h3>
+          <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
+        </div>
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+          <h3 className="text-sm font-medium text-black">Closed Cases</h3>
+          <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
+        </div>
+        <div className="p-4 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+          <h3 className="text-sm font-medium text-black">Comments Not Filed Cases</h3>
+          <div className="h-8 bg-gray-300 rounded w-3/4 mt-2 animate-pulse"></div>
+        </div>
+      </div>
   
         {/* Buttons Section */}
         <div className="flex items-center justify-center gap-4 mb-6">
