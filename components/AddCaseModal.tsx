@@ -84,7 +84,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
               <div>
                 <label className="block text-gray-600 mb-1">Date of Hearing:</label>
                 <input
-                  type="date"
+                  type="text"
                   name="date_of_hearing"
                   value={formData.date_of_hearing}
                   onChange={handleChange}
@@ -97,10 +97,11 @@ const AddCaseModal = ({ isOpen, onClose }) => {
                 <input
                   type="text"
                   name="cp_sa_suit"
+                  required
                   value={formData.cp_sa_suit}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  
                 />
               </div>
             </div>
@@ -154,13 +155,13 @@ const AddCaseModal = ({ isOpen, onClose }) => {
                   value={formData.concerned_office}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  required
+                  
                 />
               </div>
               <div>
                 <label className="block text-gray-600 mb-1">Last Hearing Date:</label>
                 <input
-                  type="date"
+                  type="text"
                   name="last_hearing_date"
                   value={formData.last_hearing_date}
                   onChange={handleChange}
