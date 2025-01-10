@@ -115,7 +115,6 @@ const ExcelComponent = () => {
 
     setFilteredCases(filtered);
 
-    console.log("here are filtered cases",filtered)
   };
 
   const totalCases = cases.length;
@@ -439,16 +438,21 @@ const ExcelComponent = () => {
 
   const getRowClass = (hearingDate: string) => {
     if (!hearingDate) return ""; // Handle missing or invalid dates
+    // 
+    const [day, month, year] = hearingDate.split('/').map(part => parseInt(part, 10));
+    const twoDigitYear = year > 99 ? year % 100 : year;
+    const convertedDate = `${day}/${month}/${twoDigitYear}`
+
+
 
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time for accurate day comparison
     
-    const hearing = parseDate(hearingDate);
+    const hearing = parseDate(convertedDate);
     if (isNaN(hearing.getTime())) return ""; // Handle invalid date format
     
     const diffInTime = hearing.getTime() - today.getTime();
     const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)); // Convert milliseconds to days
-    console.log( " we are here  ",diffInDays)
     
     if (diffInDays <= 3 && diffInDays >= 2) {
       return "bg-red-100"; // Highlight for 2-3 days before the hearing

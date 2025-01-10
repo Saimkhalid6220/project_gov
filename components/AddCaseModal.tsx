@@ -1,10 +1,10 @@
 'use client';
 import { useToast } from '@/hooks/use-toast';
 import axios from 'axios';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 
 const AddCaseModal = ({ isOpen, onClose }) => {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0);
   const [formData, setFormData] = useState({
     date_of_hearing: '',
     cp_sa_suit: '',
@@ -20,8 +20,10 @@ const AddCaseModal = ({ isOpen, onClose }) => {
   const { toast } = useToast();
   const [error, setError] = useState('');
 
+  const isFirstExecution = useRef(true)
+
   const handleNext = () => {
-    if (step === 1 && !formData.cp_sa_suit.trim()) {
+    if (step === 0 && !formData.cp_sa_suit.trim()) {
       toast({
         title: 'Validation Error',
         description: 'The CP/SA/Suit field is required.',
@@ -38,10 +40,13 @@ const AddCaseModal = ({ isOpen, onClose }) => {
     e.preventDefault();
 
     // Final Validation before submission
-    if (!formData.cp_sa_suit.trim()) {
+    if (isFirstExecution.current) {
+      isFirstExecution.current = false;
+      return;
+    } else if(!formData.cp_sa_suit.trim()) {
       toast({
         title: 'Validation Error',
-        description: 'The CP/SA/Suit field is required.',
+        description: 'The CP/SA/SUIT field is required.',
         variant: 'destructive',
       });
       return;
@@ -97,7 +102,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
         <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Add New Case</h2>
 
         <form onSubmit={handleSubmit}>
-          {step === 1 && (
+          {step === 0 && (
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-600 mb-1">Date of Hearing:</label>
@@ -124,7 +129,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {step === 2 && (
+          {step === 1 && (
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-600 mb-1">Subject:</label>
@@ -162,7 +167,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {step === 3 && (
+          {step === 2 && (
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-600 mb-1">Concerned Office:</label>
@@ -208,7 +213,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
           )}
 
           <div className="flex justify-between mt-6">
-            {step > 1 && (
+            {step > 0 && (
               <button
                 type="button"
                 onClick={handlePrevious}
@@ -217,22 +222,23 @@ const AddCaseModal = ({ isOpen, onClose }) => {
                 Previous
               </button>
             )}
-            {step < 3 ? (
-              <button
-                type="button"
-                onClick={handleNext}
-                className="bg-blue-500 text-white text-sm py-2 px-8 rounded-lg hover:bg-blue-600"
-              >
-                Next
-              </button>
-            ) : (
-              <button
-                type="submit"
-                className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-              >
-                Submit
-              </button>
-            )}
+            {step <2 ? (
+  <button
+    type="button" // Change type to "button"
+    onClick={handleNext}
+    className="bg-blue-500 text-white text-sm py-2 px-8 rounded-lg hover:bg-blue-600"
+  >
+    Next
+  </button>
+) : (
+  <button
+    type="submit"
+    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+  >
+    Submit
+  </button>
+)}
+
           </div>
         </form>
       </div>
