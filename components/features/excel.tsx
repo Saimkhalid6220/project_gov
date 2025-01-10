@@ -114,6 +114,8 @@ const ExcelComponent = () => {
     }
 
     setFilteredCases(filtered);
+
+    console.log("here are filtered cases",filtered)
   };
 
   const totalCases = cases.length;
@@ -227,7 +229,7 @@ const ExcelComponent = () => {
     })
 
     try {
-      const cp_sa_suit = cases[rowIndex].cp_sa_suit;
+      const cp_sa_suit = filteredCases[rowIndex].cp_sa_suit
 
       // Send the DELETE request to the API
       const response = await fetch('/api/CourtCases', {
@@ -242,7 +244,7 @@ const ExcelComponent = () => {
 
       if (response.ok) {
         // Remove the deleted case from the state
-        const updatedCases = cases.filter((_, index) => index !== rowIndex);
+        const updatedCases = filteredCases.filter((_, index) => index !== rowIndex);
         setCases(updatedCases);
         setFilteredCases(updatedCases);
         handleSaveChanges(); // Optionally save changes to localStorage
@@ -381,6 +383,8 @@ const ExcelComponent = () => {
 
   const handleDeletepdf = async (id: string) => {
 
+    console.log(id)
+
     const encodedPdfId = encodeURIComponent(id);
     toast({
       title: 'deleting',
@@ -438,13 +442,14 @@ const ExcelComponent = () => {
 
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time for accurate day comparison
-
+    
     const hearing = parseDate(hearingDate);
     if (isNaN(hearing.getTime())) return ""; // Handle invalid date format
-
+    
     const diffInTime = hearing.getTime() - today.getTime();
     const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)); // Convert milliseconds to days
-
+    console.log( " we are here  ",diffInDays)
+    
     if (diffInDays <= 3 && diffInDays >= 2) {
       return "bg-red-100"; // Highlight for 2-3 days before the hearing
     } else if (diffInDays <= 7 && diffInDays > 3) {
