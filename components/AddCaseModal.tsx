@@ -1,64 +1,84 @@
-'use client'
-import { useToast } from "@/hooks/use-toast";
-import axios from "axios";
-import { redirect } from "next/navigation";
-import React, { useState } from "react";
+'use client';
+import { useToast } from '@/hooks/use-toast';
+import axios from 'axios';
+import React, { useState } from 'react';
 
 const AddCaseModal = ({ isOpen, onClose }) => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    date_of_hearing: "",
-    cp_sa_suit: "",
-    subject: "",
-    petitioner: "",
-    court: "",
-    concerned_office: "",
-    comments: "",
-    last_hearing_date: "",
-    remarks: "",
+    date_of_hearing: '',
+    cp_sa_suit: '',
+    subject: '',
+    petitioner: '',
+    court: '',
+    concerned_office: '',
+    comments: '',
+    last_hearing_date: '',
+    remarks: '',
   });
 
-  const {toast} = useToast()
+  const { toast } = useToast();
+  const [error, setError] = useState('');
 
-  const [error, setError] = useState("");
-  const handleNext = () => setStep((prev) => prev + 1);
+  const handleNext = () => {
+    if (step === 1 && !formData.cp_sa_suit.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'The CP/SA/Suit field is required.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    setStep((prev) => prev + 1);
+  };
+
   const handlePrevious = () => setStep((prev) => prev - 1);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    toast({
-      title:"creating case...",
-      description:"please wait",
-    })
-    try {
-      await axios.post("/api/CourtCases", formData);
-      console.log("this is form data",formData)
-      // Handle success (e.g., redirect or show message)
-    } catch (err) {
-      setError("Error creating user");
-    } finally {
-      if(!error){
-        toast({
-          title:"Success",
-        description:"Case Created",
-        variant:"success",
-        })
-      } else {
-        toast({
-          title:"failure",
-          description:"Error creating Case",
-          variant:"destructive",
-        })
-      }
+
+    // Final Validation before submission
+    if (!formData.cp_sa_suit.trim()) {
+      toast({
+        title: 'Validation Error',
+        description: 'The CP/SA/Suit field is required.',
+        variant: 'destructive',
+      });
+      return;
     }
-    window.location.href="/"
+
+    toast({
+      title: 'Creating case...',
+      description: 'Please wait.',
+    });
+
+    try {
+      await axios.post('/api/CourtCases', formData);
+      console.log('Form data submitted:', formData);
+
+      toast({
+        title: 'Success',
+        description: 'Case created successfully.',
+        variant: 'success',
+      });
+
+      window.location.href = '/';
+    } catch (err) {
+      console.error(err);
+      setError('Error creating case');
+      toast({
+        title: 'Failure',
+        description: 'Error creating the case.',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -66,17 +86,15 @@ const AddCaseModal = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-  <div className="relative  bg-gray-50 rounded-lg p-8 w-full max-w-xl shadow-xl">
-    <button
-      className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
-      onClick={onClose}
-    >
-      &times;
-    </button>
+      <div className="relative bg-gray-50 rounded-lg p-8 w-full max-w-xl shadow-xl">
+        <button
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 text-2xl font-bold"
+          onClick={onClose}
+        >
+          &times;
+        </button>
 
-    <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
-      Add New Case
-    </h2>
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">Add New Case</h2>
 
         <form onSubmit={handleSubmit}>
           {step === 1 && (
@@ -101,7 +119,6 @@ const AddCaseModal = ({ isOpen, onClose }) => {
                   value={formData.cp_sa_suit}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  
                 />
               </div>
             </div>
@@ -155,7 +172,6 @@ const AddCaseModal = ({ isOpen, onClose }) => {
                   value={formData.concerned_office}
                   onChange={handleChange}
                   className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  
                 />
               </div>
               <div>
@@ -191,7 +207,6 @@ const AddCaseModal = ({ isOpen, onClose }) => {
             </div>
           )}
 
-          {/* Navigation Buttons */}
           <div className="flex justify-between mt-6">
             {step > 1 && (
               <button
