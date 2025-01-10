@@ -47,8 +47,8 @@ const ExcelComponent = () => {
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
   const [isFilterModalOpen, setFilterModalOpen] = useState(false);
-  const[uploadedPdf,setUploadedPdf] = useState<string[]>([""]);
-  const [getPdf,setGetPdf] = useState(false)
+  const [uploadedPdf, setUploadedPdf] = useState<string[]>([""]);
+  const [getPdf, setGetPdf] = useState(false)
 
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -84,16 +84,16 @@ const ExcelComponent = () => {
   }, []);
 
   useEffect(() => {
-   const getUploadedPdf = async () =>{
-    const response = await fetch('/api/Get');
-    const data = await response.json();
+    const getUploadedPdf = async () => {
+      const response = await fetch('/api/Get');
+      const data = await response.json();
 
-    setUploadedPdf(data)
+      setUploadedPdf(data)
 
-    console.log(data)
-   }
+      console.log(data)
+    }
 
-   getUploadedPdf();
+    getUploadedPdf();
   }, [getPdf])
 
   const handleSaveChanges = () => {
@@ -129,31 +129,32 @@ const ExcelComponent = () => {
   const closedCases = cases.filter(row => {
     if (remarksIndex !== null) {
       const value = row[headers[remarksIndex]]?.toString().toLowerCase().trim() || '';
-      return value === 'dismissed' || value === 'disposed off with direction' || value === 'disposed'|| value === 'disposed off' || value === "disposed of with directions" || value === 'disposed of';
+      return value === 'dismissed' || value === 'disposed off with direction' || value === 'disposed' || value === 'disposed off' || value === "disposed of with directions" || value === 'disposed of';
     }
     return false;
   }).length;
-  
 
- // Find the index of the "comments" column dynamically
-useEffect(() => {
-  const commentsIdx = headers.findIndex(
-    (header) => header.toLowerCase() === 'comments'
-  );
-  setCommentsIndex(commentsIdx);
-}, [headers]);
 
-// Calculate CasesNotFiled
-const CasesNotFiled = cases.filter((row) => {
-  if (commentsIndex !== null && headers[commentsIndex]) {
-    const value = row[headers[commentsIndex]]?.toString().toLowerCase().trim() || '';
-    return value === 'no' || value === 'No'; // Check if value is 'no' or empty
-  }
-  return false;
-}).length;
+  // Find the index of the "comments" column dynamically
+  useEffect(() => {
+    const commentsIdx = headers.findIndex(
+      (header) => header.toLowerCase() === 'comments'
+    );
+    setCommentsIndex(commentsIdx);
+  }, [headers]);
 
-// Calculate CasesYesFiled
-const CasesYesFiled = totalCases - CasesNotFiled;
+  // Calculate CasesNotFiled
+  const CasesNotFiled = cases.filter((row) => {
+    if (commentsIndex !== null && headers[commentsIndex]) {
+      const value = row[headers[commentsIndex]]?.toString().toLowerCase().trim() || '';
+      return value === 'no' || value === 'No'; // Check if value is 'no' or empty
+    }
+    return false;
+  }).length;
+
+
+  // Calculate CasesYesFiled
+  const CasesYesFiled = totalCases - CasesNotFiled;
 
 
   const handleEdit = (rowIndex: number) => {
@@ -325,7 +326,7 @@ const CasesYesFiled = totalCases - CasesNotFiled;
           c.cp_sa_suit === cp_sa_suit ? { ...c, attachment: result.fileUrl } : c
         );
 
-        setGetPdf((prevState)=>(prevState === false ? true : false))
+        setGetPdf((prevState) => (prevState === false ? true : false))
 
         setCases(updatedCases);
         setFilteredCases(updatedCases); // Reflect changes in filtered data
@@ -350,7 +351,7 @@ const CasesYesFiled = totalCases - CasesNotFiled;
 
   const [downloading, setDownloading] = useState(false); // Add downloading state
 
-  const handleDownload = async (pdfId:string) => {
+  const handleDownload = async (pdfId: string) => {
     setDownloading(true); // Show loader
 
     const encodedPdfId = encodeURIComponent(pdfId); // Encode special characters
@@ -378,12 +379,12 @@ const CasesYesFiled = totalCases - CasesNotFiled;
     }
   };
 
-  const handleDeletepdf = async (id:string) => {
+  const handleDeletepdf = async (id: string) => {
 
     const encodedPdfId = encodeURIComponent(id);
     toast({
-      title:'deleting',
-      description:'please wait',
+      title: 'deleting',
+      description: 'please wait',
     })
 
     try {
@@ -394,26 +395,26 @@ const CasesYesFiled = totalCases - CasesNotFiled;
       )
       if (!response.ok) {
         toast({
-          title:'failure',
-          description:'unable to delete',
-          variant:'destructive'
+          title: 'failure',
+          description: 'unable to delete',
+          variant: 'destructive'
         })
         throw new Error("Failed to delete PDF");
-      } else{
-        setGetPdf((prevState)=>(prevState === false ? true : false))
+      } else {
+        setGetPdf((prevState) => (prevState === false ? true : false))
         toast({
-          title:'success',
-          description:'deleted successfully',
-          variant:'success'
+          title: 'success',
+          description: 'deleted successfully',
+          variant: 'success'
         })
-        }
-      } catch(e){
-        console.error(error)
-      } finally {
       }
+    } catch (e) {
+      console.error(error)
+    } finally {
+    }
   }
   // Open PDF preview in a new tab (unchanged)
-  const handleFilePreview = (pdfId:string) => {
+  const handleFilePreview = (pdfId: string) => {
 
     const encodedPdfId = encodeURIComponent(pdfId); // Encode special characters
 
@@ -427,22 +428,29 @@ const CasesYesFiled = totalCases - CasesNotFiled;
       <Progress />
     );
   }
-
-  const getDateDifference = (hearingDate: string): number => {
-    const today = new Date();
-    const hearing = new Date(hearingDate);
-    const difference = (hearing.getTime() - today.getTime()) / (1000 * 3600 * 24);
-    return difference;
+  const parseDate = (dateString: string) => {
+    const [day, month, year] = dateString.split("/").map(Number);
+    return new Date(2000 + year, month - 1, day); // Adjust for 2-digit year (2000+)
   };
-  
+
   const getRowClass = (hearingDate: string) => {
-    const diff = getDateDifference(hearingDate);
-    if (diff <= 7 && diff > 3) {
-      return "bg-yellow-200"; // Yellow if within a week
-    } else if (diff <= 3 && diff >= 2) {
-      return "bg-red-200"; // Red if within 3 to 2 days
+    if (!hearingDate) return ""; // Handle missing or invalid dates
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time for accurate day comparison
+
+    const hearing = parseDate(hearingDate);
+    if (isNaN(hearing.getTime())) return ""; // Handle invalid date format
+
+    const diffInTime = hearing.getTime() - today.getTime();
+    const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)); // Convert milliseconds to days
+
+    if (diffInDays <= 3 && diffInDays >= 2) {
+      return "bg-red-100"; // Highlight for 2-3 days before the hearing
+    } else if (diffInDays <= 7 && diffInDays > 3) {
+      return "bg-yellow-100"; // Highlight for 4-7 days before the hearing
     }
-    return ""; // No class if outside these ranges
+    return ""; // No highlight for other cases
   };
 
   if (loading) {
@@ -587,36 +595,36 @@ const CasesYesFiled = totalCases - CasesNotFiled;
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">
-                    {uploadedPdf.find((pdfId)=>pdfId==row.cp_sa_suit) ? (
-                      <>
-                      <a onClick={()=>handleFilePreview(row.cp_sa_suit)} className="cursor-pointer text-blue-600 hover:text-blue-800">
-                        <FaEye className="h-4 w-4" title="View File" />
-                      </a>
-                      <a onClick={()=>handleDownload(row.cp_sa_suit)} className="text-blue-600 hover:text-blue-800">
-                        <FaDownload className="h-4 w-4" title="Download File" />
-                      </a>
-                         <a onClick={()=>handleDeletepdf(row.cp_sa_suit)} className="text-red-600 hover:text-red-800">
-                        <FaTrashAlt className="h-4 w-4" title="Download File" />
-                      </a>
-                      </>
+                      {uploadedPdf.find((pdfId) => pdfId == row.cp_sa_suit) ? (
+                        <>
+                          <a onClick={() => handleFilePreview(row.cp_sa_suit)} className="cursor-pointer text-blue-600 hover:text-blue-800">
+                            <FaEye className="h-4 w-4" title="View File" />
+                          </a>
+                          <a onClick={() => handleDownload(row.cp_sa_suit)} className="text-blue-600 hover:text-blue-800">
+                            <FaDownload className="h-4 w-4" title="Download File" />
+                          </a>
+                          <a onClick={() => handleDeletepdf(row.cp_sa_suit)} className="text-red-600 hover:text-red-800">
+                            <FaTrashAlt className="h-4 w-4" title="Download File" />
+                          </a>
+                        </>
                       ) : (
                         <>
-                      <label className="cursor-pointer">
-                        <input
-                          type="file"
-                          accept="application/pdf"
-                          onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
-                          className="hidden"
-                          />
-                          <FaUpload
-                          className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
-                          title="Upload File"
-                          />
-                      </label>
-                          </>
+                          <label className="cursor-pointer">
+                            <input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
+                              className="hidden"
+                            />
+                            <FaUpload
+                              className="h-4 w-4 text-green-600 hover:text-green-800 cursor-pointer"
+                              title="Upload File"
+                            />
+                          </label>
+                        </>
                       )
-                    
-                    }
+
+                      }
                     </div>
                   )}
                 </td>
@@ -662,17 +670,9 @@ const CasesYesFiled = totalCases - CasesNotFiled;
                 }
               </tr>
             ))}
-
           </tbody>
-
-
-
         </table>
-
-
-
       </div>
-
       <Button onClick={scrollToTop} className="bg-gray-600 pt-2 pb-2 gap-x-2 gap-y-2 hover:bg-gray-700 text-white px-4 py-2 rounded">
         Scroll to Top
       </Button>
