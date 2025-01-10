@@ -4,10 +4,10 @@ import Pdf from '@/(models)/pdf';
 export async function GET() {
     try {
       // Fetch all documents from the Pdf collection
-      const pdfs = await Pdf.find({}, 'cp_sa_suit'); // Retrieve only the `cp_sa_suit` field
+      const pdfs = await Pdf.find({}, 'pdfId'); // Retrieve only the `cp_sa_suit` field
   
       // Map the result to return only the `cp_sa_suit` array
-      const cpSaSuits = pdfs.map((pdf) => pdf.cp_sa_suit);
+      const cpSaSuits = pdfs.map((pdf) => pdf.pdfId);
   
       // Return the array as JSON
       return NextResponse.json(cpSaSuits, { status: 200 });

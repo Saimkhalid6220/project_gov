@@ -11,7 +11,7 @@ export async function DELETE(req, { params }) {
 
   try {
     // Attempt to delete the PDF document by ID
-    const deletedPdf = await Pdf.findOneAndDelete({ cp_sa_suit: decodedId });
+    const deletedPdf = await Pdf.findOneAndDelete({ pdfId: decodedId });
 
     if (!deletedPdf) {
       return NextResponse.json({ message: "PDF not found" }, { status: 404 });

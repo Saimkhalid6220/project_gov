@@ -1,6 +1,7 @@
 
 import { NextResponse } from 'next/server';
 import Pdf from '@/(models)/pdf';
+import { cp } from 'fs';
 
 export async function POST(req){
 
@@ -18,7 +19,7 @@ export async function POST(req){
         
         const newPDF = new Pdf({
             name:file.name,
-            cp_sa_suit:cp_sa_suit,
+            pdfId:cp_sa_suit,
             data:bufferData,
             contentType:file.type
         })
