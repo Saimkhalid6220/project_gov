@@ -12,6 +12,8 @@ import Filter from "./filter";
 import { useSession } from "next-auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { FaSpinner } from "react-icons/fa"; // Import a spinner icon
+import { parse, isValid, differenceInDays } from 'date-fns'; // Add the imports
+import './excel.css'; // Import the CSS file
 
 const ExcelComponent = () => {
   // Case Interface Updated to include 'attachment'
@@ -44,6 +46,7 @@ const ExcelComponent = () => {
   const [editedData, setEditedData] = useState<Partial<Case>>({});
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [remarksIndex, setRemarksIndex] = useState<number | null>(null);
+  const [hearingDateIndex, setHearingDateIndex] = useState(null);
   const [commentsIndex, setCommentsIndex] = useState<number | null>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const topRef = useRef<HTMLDivElement>(null);
@@ -154,10 +157,32 @@ const ExcelComponent = () => {
     return false;
   }).length;
 
-
   // Calculate CasesYesFiled
   const CasesYesFiled = totalCases - CasesNotFiled;
 
+  const getPetitionersWithHearingNear = (days: number) => {
+    return cases
+      .filter((row) => {
+        const hearingDate = row.date_of_hearing;
+        if (!hearingDate) return false;
+  
+        const [day, month, year] = hearingDate.split('/').map(part => parseInt(part, 10));
+        const twoDigitYear = year > 99 ? year % 100 : year;
+        const convertedDate = `${day}/${month}/${twoDigitYear}`;
+  
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time for accurate day comparison
+  
+        const hearing = parseDate(convertedDate);
+        if (isNaN(hearing.getTime())) return false; // Handle invalid date format
+  
+        const diffInTime = hearing.getTime() - today.getTime();
+        const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)); // Convert milliseconds to days
+  
+        return diffInDays <= days && diffInDays >= 0;
+      })
+      .map((row) => row.petitioner); // Return the PETITIONER
+  };
 
   const handleEdit = (rowIndex: number) => {
     setEditingRow(rowIndex);
@@ -438,29 +463,27 @@ const ExcelComponent = () => {
   };
 
   const getRowClass = (hearingDate: string) => {
-    if (!hearingDate) return ""; // Handle missing or invalid dates
-    // 
+    if (!hearingDate) return { className: "", symbol: "" }; // Handle missing or invalid dates
+  
     const [day, month, year] = hearingDate.split('/').map(part => parseInt(part, 10));
     const twoDigitYear = year > 99 ? year % 100 : year;
-    const convertedDate = `${day}/${month}/${twoDigitYear}`
-
-
-
+    const convertedDate = `${day}/${month}/${twoDigitYear}`;
+  
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset time for accurate day comparison
-    
+  
     const hearing = parseDate(convertedDate);
-    if (isNaN(hearing.getTime())) return ""; // Handle invalid date format
-    
+    if (isNaN(hearing.getTime())) return { className: "", symbol: "" }; // Handle invalid date format
+  
     const diffInTime = hearing.getTime() - today.getTime();
     const diffInDays = Math.ceil(diffInTime / (1000 * 3600 * 24)); // Convert milliseconds to days
-    
-    if (diffInDays <= 3 && diffInDays >= 2) {
-      return "bg-red-100"; // Highlight for 2-3 days before the hearing
+  
+    if (diffInDays <= 3 && diffInDays >= 1) {
+      return { className: "bg-red-200", symbol: "⚠️ Near" }; // Highlight for 2-3 days before the hearing
     } else if (diffInDays <= 7 && diffInDays > 3) {
-      return "bg-yellow-100"; // Highlight for 4-7 days before the hearing
+      return { className: "bg-yellow-100", symbol: "" }; // Highlight for 4-7 days before the hearing
     }
-    return ""; // No highlight for other cases
+    return { className: "", symbol: "" }; // No highlight for other cases
   };
 
   if (loading) {
@@ -489,7 +512,34 @@ const ExcelComponent = () => {
           <p className="text-2xl font-semibold mt-2 text-red-600">{CasesNotFiled}</p>
         </div>
       </div>
-
+      <div className="w-full grid grid-cols-2 gap-4 mb-6">
+      <div className="p-2 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+        <h3 className="text-sm font-bold text-yellow-600">Hearing in 6 Days</h3>
+        <div className="marquee">
+          <div className="marquee-content">
+            <p className="text-sm font-semibold mt-2 text-yellow-600 inline-block">
+              {getPetitionersWithHearingNear(6).join(', ')}
+            </p>
+            <p className="text-sm font-semibold mt-2 text-yellow-600 inline-block">
+              {getPetitionersWithHearingNear(6).join(', ')}
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="p-2 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
+        <h3 className="text-sm font-bold text-red-700 ">Hearing in 3 Days ⚠️</h3>
+        <div className="marquee">
+          <div className="marquee-content">
+            <p className="text-sm font-semibold mt-2 text-red-600 inline-block">
+              {getPetitionersWithHearingNear(3).join(', ')}
+            </p>
+            <p className="text-sm font-semibold mt-2 text-red-600 inline-block">
+              {getPetitionersWithHearingNear(3).join(', ')}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
       <div className="flex items-center justify-center gap-4 mb-6">
         {/* Filter Modal */}
         {isFilterModalOpen ? (
@@ -573,28 +623,35 @@ const ExcelComponent = () => {
                 <td className="border border-gray-300 p-2 text-sm text-black">
                   {rowIndex + 1}
                 </td>
-                {headers.map((header, cellIndex) => (
-                  <td
-                    key={cellIndex}
-                    className="border border-gray-300 p-2 text-sm text-black"
-                  >
-                    {editingRow === rowIndex ? (
-                      <input
-                        type="text"
-                        value={editedData[header] || row[header] || ""}
-                        onChange={(e) => {
-                          const newData = { ...editedData };
-                          newData[header] = e.target.value;
-                          setEditedData(newData);
-                        }}
-                        className="w-full p-1 border rounded bg-white text-black"
-                      />
-                    ) : (
-                      row[header] || "-" // Add a hyphen if the cell value is empty or null
-                    )}
-                  </td>
-                ))}
-
+{headers.map((header, cellIndex) => {
+  const { className, symbol } = getRowClass(row.date_of_hearing);
+  return (
+    <td
+      key={cellIndex}
+      className={`border border-gray-300 p-2 text-sm text-black ${className}`}
+    >
+      {editingRow === rowIndex ? (
+        <input
+          type="text"
+          value={editedData[header] || row[header] || ""}
+          onChange={(e) => {
+            const newData = { ...editedData };
+            newData[header] = e.target.value;
+            setEditedData(newData);
+          }}
+          className="w-full p-1 border rounded bg-white text-black"
+        />
+      ) : (
+        <>
+          {row[header] || "-"} {/* Add a hyphen if the cell value is empty or null */}
+          {header === "date_of_hearing" && symbol && (
+            <span className="text-red-500 ml-2">{symbol}</span>
+          )}
+        </>
+      )}
+    </td>
+  );
+})}
 
                 {/* PDF Attachment Column */}
                 {/* File Actions Column */}
