@@ -68,10 +68,10 @@ export async function PATCH(req) {
       return NextResponse.json({ message: "sr_no and updateData are required" }, { status: 400 });
     }
 
-    const cp_sa_suit = updatedData.cp_sa_suit;
+    const _id = updatedData._id;
 
     const updatedCase = await CourtCases.findOneAndUpdate(
-      { cp_sa_suit }, // Filter by cp_sa_suit
+      { _id }, // Filter by cp_sa_suit
       { $set: updatedData }, // Fields to update
       { new: true, runValidators: true } // Return the updated document and validate inputs
     );
@@ -99,7 +99,7 @@ export async function DELETE(req) {
     }
 
     // Find and delete the case by sr_no
-    const deletedCase = await CourtCases.findOneAndDelete({ cp_sa_suit });
+    const deletedCase = await CourtCases.findOneAndDelete({ _id:cp_sa_suit });
 
     if (!deletedCase) {
       return NextResponse.json({ message: "Case with given sr_no not found" }, { status: 404 });

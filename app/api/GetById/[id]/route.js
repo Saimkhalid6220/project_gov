@@ -13,7 +13,7 @@ export async function GET(req, { params }) {
 
   
     try {
-      const pdf = await Pdf.findOne({cp_sa_suit:decodedId})
+      const pdf = await Pdf.findOne({pdfId:decodedId})
   
       if (!pdf) {
         return NextResponse.json({ message: "PDF not found" }, { status: 404 });

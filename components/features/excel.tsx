@@ -18,6 +18,7 @@ import './excel.css'; // Import the CSS file
 const ExcelComponent = () => {
   // Case Interface Updated to include 'attachment'
   interface Case {
+    _id:string;
     sr_no: number;
     date_of_hearing: string;
     cp_sa_suit: string;
@@ -253,7 +254,7 @@ const ExcelComponent = () => {
     })
 
     try {
-      const cp_sa_suit = filteredCases[rowIndex].cp_sa_suit
+      const cp_sa_suit = filteredCases[rowIndex]._id
 
       // Send the DELETE request to the API
       const response = await fetch('/api/CourtCases', {
@@ -661,15 +662,15 @@ const ExcelComponent = () => {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center gap-2">
-                      {uploadedPdf.find((pdfId) => pdfId == row.cp_sa_suit) ? (
+                      {uploadedPdf.find((pdfId) => pdfId == row._id) ? (
                         <>
-                          <a onClick={() => handleFilePreview(row.cp_sa_suit)} className="cursor-pointer text-blue-600 hover:text-blue-800">
+                          <a onClick={() => handleFilePreview(row._id)} className="cursor-pointer text-blue-600 hover:text-blue-800">
                             <FaEye className="h-4 w-4" title="View File" />
                           </a>
-                          <a onClick={() => handleDownload(row.cp_sa_suit)} className="text-blue-600 hover:text-blue-800">
+                          <a onClick={() => handleDownload(row._id)} className="text-blue-600 hover:text-blue-800">
                             <FaDownload className="h-4 w-4" title="Download File" />
                           </a>
-                          <a onClick={() => handleDeletepdf(row.cp_sa_suit)} className="text-red-600 hover:text-red-800">
+                          <a onClick={() => handleDeletepdf(row._id)} className="text-red-600 hover:text-red-800">
                             <FaTrashAlt className="h-4 w-4" title="Download File" />
                           </a>
                         </>
@@ -679,7 +680,7 @@ const ExcelComponent = () => {
                             <input
                               type="file"
                               accept="application/pdf"
-                              onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row.cp_sa_suit)}
+                              onChange={(e) => e.target.files && handleFileUpload(e.target.files[0], row._id)}
                               className="hidden"
                             />
                             <FaUpload
