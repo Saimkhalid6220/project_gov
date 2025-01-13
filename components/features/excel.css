@@ -13,5 +13,5 @@
   .marquee-content {
     display: inline-block;
     padding-right: 100%; /* Ensure there's enough space for the second copy */
-    animation: marquee 70s linear infinite;
+    animation: marquee 110s linear infinite;
   }
