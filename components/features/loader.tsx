@@ -26,7 +26,7 @@ const Progress = () => {
       {/*  */}
       <div className="w-full grid grid-cols-2 gap-4 mb-6">
       <div className="p-2 rounded-lg w-full bg-white border border-gray-400 shadow-sm">
-        <h3 className="text-sm font-bold text-yellow-600">Hearing in 6 Days</h3>
+        <h3 className="text-sm font-bold text-yellow-600">Hearing in 6 Days !</h3>
       
             <div className="h-8 bg-gray-300 rounded w-full mt-2 animate-pulse"></div>
         
