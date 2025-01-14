@@ -5,7 +5,7 @@ import React from "react";
 
 const SignOut = () => {
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "https://education-dashboard-silk.vercel.app/" });
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
