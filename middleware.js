@@ -17,7 +17,8 @@ export default withAuth(
       return NextResponse.rewrite(new URL("/", req.url));
     }
     else if (
-      req.nextUrl.pathname.startsWith("/")
+      req.nextUrl.pathname.startsWith("/") && 
+      !req.nextauth.token.email
     ) {
       return NextResponse.rewrite(new URL("/Login", req.url));
     }
