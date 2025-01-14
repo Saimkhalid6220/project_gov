@@ -16,6 +16,11 @@ export default withAuth(
     ) {
       return NextResponse.rewrite(new URL("/", req.url));
     }
+    else if (
+      req.nextUrl.pathname.startsWith("/")
+    ) {
+      return NextResponse.rewrite(new URL("/Login", req.url));
+    }
   },
   {
     callbacks: {
@@ -24,4 +29,4 @@ export default withAuth(
   }
 );
 
-export const config = { matcher: ["/createUser","/manageUser"] };
+export const config = { matcher: ["/createUser","/manageUser","/"] };
