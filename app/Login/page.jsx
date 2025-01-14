@@ -21,7 +21,7 @@ export default function SignIn() {
       setError("Invalid email or password");
     } else {
       // Redirect to the homepage or a secure area
-      window.location.href = "https://education-dashboard-silk.vercel.app/";
+      window.location.href = process.env.NEXT_PUBLIC_BASE_URL;
     }
   };
 
