@@ -1,4 +1,4 @@
-import CourtCases from "@/models/courtCases";
+import CourtCases from "../../../models/courtCases";
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { options } from "../auth/[...nextauth]/options";
