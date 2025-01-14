@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Pdf from '@/(models)/pdf';
+import Pdf from '@/models/pdf';
 
 export async function DELETE(req, { params }) {
   const { id } = params; // Extract the PDF ID from the route params

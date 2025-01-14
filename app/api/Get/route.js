@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import Pdf from '@/(models)/pdf';
+import Pdf from '@/models/pdf';
 
 export async function GET() {
     try {

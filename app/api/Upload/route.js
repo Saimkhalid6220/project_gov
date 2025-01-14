@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import Pdf from '@/(models)/pdf';
+import Pdf from '@/models/pdf';
 import { cp } from 'fs';
 
 export async function POST(req){
