@@ -67,7 +67,7 @@ const AddCaseModal = ({ isOpen, onClose }) => {
         variant: 'success',
       });
 
-      window.location.href = '/';
+      window.location.href = 'https://education-dashboard-silk.vercel.app/';
     } catch (err) {
       console.error(err);
       setError('Error creating case');
