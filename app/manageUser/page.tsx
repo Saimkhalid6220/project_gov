@@ -198,12 +198,12 @@ const ManageUsers = () => {
                   {editingUserId === user._id ? (
                     <select
                       name="isAdmin"
-                      value={editedData.isAdmin || false}
+                      value={String(editedData.isAdmin) || "false"}
                       onChange={handleFieldChange}
                       className="border border-gray-300 p-2 rounded"
                     >
-                      <option value={true}>Yes</option>
-                      <option value={false}>No</option>
+                      <option value={"true"}>Yes</option>
+                      <option value={"false"}>No</option>
                     </select>
                   ) : (
                     user.isAdmin ? "Yes" : "No"
