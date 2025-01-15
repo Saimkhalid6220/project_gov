@@ -36,7 +36,7 @@ const ExcelComponent = () => {
 
   const { toast } = useToast();
 
-  const { data: session } = useSession({ required: true })
+  const { data: session } = useSession()
 
   const [cases, setCases] = useState<Case[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
