@@ -5,6 +5,8 @@ import { getServerSession } from "next-auth/next";
 import { options } from "@/app/api/auth/[...nextauth]/options";
 
 
+
+
 export async function POST(req) {
   const session = await getServerSession(options);
   if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });

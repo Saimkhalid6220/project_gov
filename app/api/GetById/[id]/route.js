@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import Pdf from '@/models/pdf';
 
 
+
+
 export async function GET(req, { params }) {
     const { id } = await params; // Extract the PDF ID from the route params
     const decodedId = decodeURIComponent(id);
