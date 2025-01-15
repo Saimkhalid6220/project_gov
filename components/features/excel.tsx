@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FaSpinner } from "react-icons/fa"; // Import a spinner icon
 import { parse, isValid, differenceInDays } from 'date-fns'; // Add the imports
 import './excel.css'; // Import the CSS file
+import { redirect } from 'next/navigation';
 
 const ExcelComponent = () => {
   // Case Interface Updated to include 'attachment'
@@ -57,6 +58,13 @@ const ExcelComponent = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState()
+
+  const isFirstExecution = useRef(true)
+
+  if(isFirstExecution.current) {
+    isFirstExecution.current = false;
+    redirect('/')
+  }
 
   useEffect(() => {
     const fetchData = async () => {
