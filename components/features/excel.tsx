@@ -59,12 +59,6 @@ const ExcelComponent = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState()
 
-  const isFirstExecution = useRef(true)
-
-  if(isFirstExecution.current) {
-    isFirstExecution.current = false;
-    redirect('/')
-  }
 
   useEffect(() => {
     const fetchData = async () => {
