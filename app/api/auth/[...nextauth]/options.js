@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import User from "@/models/user";
 import bcrypt from "bcrypt";
-
+import { connectToDatabase } from "@/lib/mongodb";
 
 
 export const options = {
@@ -35,6 +35,7 @@ export const options = {
           },
         },
         async authorize(credentials) {
+          await connectToDatabase();
           try {
             const foundUser = await User.findOne({ email: credentials.email })
               .lean()

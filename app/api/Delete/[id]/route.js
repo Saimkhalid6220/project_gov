@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Pdf from '@/models/pdf';
+import { connectToDatabase } from "@/lib/mongodb";
 
 
 
@@ -12,6 +13,7 @@ export async function DELETE(req, { params }) {
   }
 
   try {
+    await connectToDatabase();
     // Attempt to delete the PDF document by ID
     const deletedPdf = await Pdf.findOneAndDelete({ pdfId: decodedId });
 

@@ -1,20 +1,25 @@
-import mongoose, { Schema } from "mongoose";
-
-mongoose.connect(process.env.MONGODB_URI);
-mongoose.Promise = global.Promise;
+import mongoose, { Schema } from 'mongoose';
+import { connectToDatabase } from '../lib/mongodb';
 
 const pdfSchema = new Schema(
   {
     name: String,
     pdfId: String,
-    data:Buffer,
-    contentType:String
+    data: Buffer,
+    contentType: String,
   },
   {
     timestamps: true,
   }
 );
 
-const Pdf = mongoose.models.Pdf || mongoose.model("Pdf", pdfSchema);
+let Pdf;
+
+try {
+  await connectToDatabase();
+  Pdf = mongoose.models.Pdf || mongoose.model('Pdf', pdfSchema);
+} catch (error) {
+  console.error('Error initializing Pdf model:', error);
+}
 
 export default Pdf;

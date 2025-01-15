@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import Pdf from '@/models/pdf';
 import { cp } from 'fs';
+import { connectToDatabase } from "@/lib/mongodb";
 
 export async function POST(req){
 
@@ -12,7 +13,7 @@ export async function POST(req){
     if(!file) return NextResponse.json({message: "File is required"}, {status: 400})
 
     try{
-
+        await connectToDatabase();
         
         const bytes = await file.arrayBuffer();
         const bufferData = Buffer.from(bytes);

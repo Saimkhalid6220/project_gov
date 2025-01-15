@@ -2,6 +2,7 @@ import CourtCases from "@/models/courtCases";
 import { NextResponse } from 'next/server';
 import { getServerSession } from "next-auth/next";
 import { options } from "../auth/[...nextauth]/options";
+import { connectToDatabase } from "@/lib/mongodb";
 
 
 export async function POST(req) {
@@ -9,6 +10,8 @@ export async function POST(req) {
   if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
 
   try {
+    await connectToDatabase();
+
     const courtCaseData = await req.json();
 
     // Confirm data exists
@@ -33,6 +36,7 @@ export async function GET() {
   if (!session) return NextResponse.json({ message: "You are not logged in" }, { status: 401 });
 
   try {
+    await connectToDatabase();
     // Define the fields to select
     const fieldsToSelect = {
       _id: 1,
@@ -62,6 +66,7 @@ export async function PATCH(req) {
   if (!session.user.role) return NextResponse.json({ message: "You are not alowed" }, { status: 401 });
 
   try {
+    await connectToDatabase();
     const  updatedData  = await req.json(); // Extract sr_no and updateData from the request body
 
     if (!updatedData) {
@@ -91,6 +96,9 @@ export async function DELETE(req) {
   const session = await getServerSession(options);
   if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });
   try {
+
+    await connectToDatabase();
+
     // Extract sr_no from the request body
     const { cp_sa_suit } = await req.json();
 

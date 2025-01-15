@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { getServerSession } from "next-auth/next";
 import { options } from "@/app/api/auth/[...nextauth]/options";
-
+import { connectToDatabase } from "@/lib/mongodb";
 
 
 
@@ -11,6 +11,7 @@ export async function POST(req) {
   const session = await getServerSession(options);
   if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });
   try {
+    await connectToDatabase();
     const userData = await req.json();
 
     //Confirm data exists
@@ -48,6 +49,8 @@ export async function GET(req) {
 
   try{
 
+    await connectToDatabase();
+
     const users = await User.find({});
     if (!users) {
       return NextResponse.json({ message: "No Users found." }, { status: 404 });
@@ -66,6 +69,8 @@ export async function PATCH(req) {
   if (!session.user.role) return NextResponse.json({ message: "You are not alowed" }, { status: 401 });
 
   try {
+
+    await connectToDatabase();
     const  editedData  = await req.json(); // Extract sr_no and updateData from the request body
     console.log(editedData);
 
@@ -99,6 +104,7 @@ export async function DELETE(req) {
   if (!session.user.role) return NextResponse.json({ message: "You are not allowed" }, { status: 401 });
   try {
 
+    await connectToDatabase();
     const _id = await req.json();
     // console.log(_id);
 

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import Pdf from '@/models/pdf';
+import { connectToDatabase } from "@/lib/mongodb";
 
 
 
@@ -15,6 +16,9 @@ export async function GET(req, { params }) {
 
   
     try {
+
+      await connectToDatabase();
+
       const pdf = await Pdf.findOne({pdfId:decodedId})
   
       if (!pdf) {

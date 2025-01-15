@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import Pdf from '@/models/pdf';
+import { connectToDatabase } from "@/lib/mongodb";
 
 export async function GET() {
     try {
+      await connectToDatabase();
       // Fetch all documents from the Pdf collection
       const pdfs = await Pdf.find({}, 'pdfId'); // Retrieve only the `cp_sa_suit` field
   

@@ -1,20 +1,25 @@
-import mongoose, { Schema } from "mongoose";
-
-mongoose.connect(process.env.MONGODB_URI);
-mongoose.Promise = global.Promise;
+import mongoose, { Schema } from 'mongoose';
+import { connectToDatabase } from '../lib/mongodb';
 
 const userSchema = new Schema(
   {
     name: String,
     email: String,
     password: String,
-    isAdmin:Boolean
+    isAdmin: Boolean,
   },
   {
     timestamps: true,
   }
 );
 
-const User = mongoose.models.User || mongoose.model("User", userSchema);
+let User;
+
+try {
+  await connectToDatabase();
+  User = mongoose.models.User || mongoose.model('User', userSchema);
+} catch (error) {
+  console.error('Error initializing User model:', error);
+}
 
 export default User;
